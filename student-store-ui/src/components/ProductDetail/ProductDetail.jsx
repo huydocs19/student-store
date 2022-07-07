@@ -1,14 +1,22 @@
 import * as React from "react"
-import { useParams } from 'react-router-dom';
-import NotFound from "../NotFound/NotFound";
-import ProductView from "../ProductView/ProductView";
+import axios from "axios"
+import { useParams } from "react-router-dom"
+import NotFound from "../NotFound/NotFound"
+import ProductView from "../ProductView/ProductView"
 
 
-export default function ProductDetail() {
+export default function ProductDetail(props) {
   const [product, setProduct] = React.useState(null)
   const [loading, setLoading] = React.useState(true)
-  React.useEffect(() => {
-    let {productId} = useParams()
+  let {productId} = useParams()
+  const getProductQuantity = (productId) => {
+    const item = props.shoppingCart.products.find((item) => item.itemId == productId)
+    if (item) {
+      return item.quantity
+    }
+    return 0
+  }
+  React.useEffect(() => {    
     axios.get(`https://codepath-store-api.herokuapp.com/store/${productId}`)
     .then((response) => { 
       setLoading(false)       
@@ -23,7 +31,7 @@ export default function ProductDetail() {
   return (
     <div className="product-detail">
       {loading && <h1 className="loading">Loading...</h1>}
-      {!loading && product ? <ProductView />:<NotFound />}
+      {!loading && product ? <ProductView product={product} productId={product.id} quantity={getProductQuantity(product.id)} addItemToCart={props.addItemToCart} removeItemFromCart={props.removeItemFromCart}/>:<NotFound />}
     </div>
   )
 }

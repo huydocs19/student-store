@@ -1,16 +1,17 @@
 import * as React from "react"
-import axios from "axios";
+import axios from "axios"
 import {
   BrowserRouter,
   Routes,
   Route,
   Link
-} from 'react-router-dom';
+} from 'react-router-dom'
 import Navbar from "../Navbar/Navbar"
 import Sidebar from "../Sidebar/Sidebar"
 import Home from "../Home/Home"
 import ProductDetail from "../ProductDetail/ProductDetail"
 import NotFound from "../NotFound/NotFound"
+import ProductGrid from "../ProductGrid/ProductGrid"
 import "./App.css"
 
 const baseURL = "https://codepath-store-api.herokuapp.com/store";
@@ -117,8 +118,8 @@ export default function App() {
           <Sidebar checkoutForm={checkoutForm} shoppingCart={shoppingCart} isOpen={isOpen} onToggle={handleOnToggle} onCheckoutFormChange={handleOnCheckoutFormChange} onSubmitCheckoutForm={handleOnSubmitCheckoutForm} />
           <Routes>
             <Route path="/" element={<Home shoppingCart={shoppingCart} products={products} addItemToCart={handleAddItemToCart} removeItemFromCart={handleRemoveItemFromCart}/>} />
-            <Route path="/products/:productId" element={<ProductDetail />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="/products/:productId" element={<ProductDetail shoppingCart={shoppingCart} addItemToCart={handleAddItemToCart} removeItemFromCart={handleRemoveItemFromCart}/>} /> 
+            <Route path="*" element={<NotFound />} />            
           </Routes>             
         </main>
       </BrowserRouter>

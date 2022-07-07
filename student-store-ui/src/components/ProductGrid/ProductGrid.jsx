@@ -10,7 +10,7 @@ export default function ProductGrid(props) {
     return 0
   }
   return (
-    <div className="product-grid">
+    <div id="Buy" className="product-grid">
       <div className="content">
       <h3>Best Selling Products</h3>
       <div className="grid">
