@@ -24,11 +24,12 @@ export default function App() {
 
   React.useEffect(() => {
     axios.get(baseURL)
-    .then((response) => {      
+    .then((response) => {        
       if (!response.data || response.data.products.length == 0) {
         setError("No Products To Display")
       } else {
-        setProducts(response.products);
+        setProducts(response.data.products);
+          
       }      
     })
     .catch(function (error) {
