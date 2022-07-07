@@ -1,0 +1,35 @@
+.not-found .banner {
+    width: 100%;
+    max-width: 100vw;
+    height: 130px;
+    background: var(--dark-blue);
+    display: flex;
+    align-items: center
+}
+.not-found .banner .content {
+    max-width: var(--content-width);
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    background: var(--dark-blue)
+}
+.not-found .banner .content h2 {
+    color: #fff
+}
+.not-found .content {
+    max-width: var(--content-width);
+    width: 100%;
+    margin: 0 auto
+}
+.not-found .cta {
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center
+}
+.not-found .cta h1 {
+    font-size: 90px;
+    margin-bottom: 20px
+}

@@ -1,6 +1,8 @@
 import * as React from "react"
 import Hero from "../Hero/Hero"
 import ProductGrid from "../ProductGrid/ProductGrid"
+import About from "../About/About"
+import Contact from "../Contact/Contact"
 import "./Home.css"
 
 export default function Home(props) {
@@ -8,20 +10,9 @@ export default function Home(props) {
     <div className="home">
       <Hero/>
       <ProductGrid shoppingCart={props.shoppingCart} products={props.products} addItemToCart={props.handleAddItemToCart} removeItemFromCart={props.handleRemoveItemFromCart}/>
-      <div className="about" id="About">
-        <div className="content">
-          <h3>About</h3>
-          <div className="summary">
-            <div className="text">
-              <p>The codepath student store offers great products at great prices from a great team and for a great cause.</p>
-              <p>We've searched far and wide for items that perk the interests of even the most eccentric students and decided to offer them all here in one place.</p>
-              <p>All proceeds go towards bringing high quality CS education to college students around the country.</p>
-            </div>
-              <div className="media"><img src="/assets/giant_codepath.6952ef57.svg" alt="codepath large"/>
-              </div>
-          </div>
-        </div>
-      </div>
+      <About />
+      <Contact />
+      <div class="bottom"><span class="payment-options"><img src="/assets/american_express.40f242c7.svg" alt="american express"/><img src="/assets/mastercard.c75b7bc4.svg" alt="mastercard"/><img src="/assets/paypal.6a45b239.svg" alt="paypal"/><img src="/assets/visa.a818ddc4.svg" alt="visa"/></span></div>
     </div>
   )
 }
