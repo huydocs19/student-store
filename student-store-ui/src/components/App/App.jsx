@@ -20,7 +20,7 @@ export default function App() {
   const [error, setError] = React.useState("")
   const [isOpen, setIsOpen] = React.useState(false)
   const [shoppingCart, setShoppingCart] = React.useState({totalPrice: 0, products: []})
-  const [checkoutForm, setCheckoutForm] = React.useState({studentName: "", studentEmail: ""})
+  const [checkoutForm, setCheckoutForm] = React.useState({name: "", email: ""})
 
   React.useEffect(() => {
     axios.get(baseURL)
@@ -94,8 +94,8 @@ export default function App() {
   const handleOnSubmitCheckoutForm = () => {
     axios.post('/store', {
       user: {
-        name: checkoutForm.studentName,
-        email: checkoutForm.studentEmail
+        name: checkoutForm.name,
+        email: checkoutForm.email
       },
       shoppingCart: shoppingCart.products
     })
@@ -114,9 +114,9 @@ export default function App() {
         <main>
           {/* YOUR CODE HERE! */}
           <Navbar />
-          <Sidebar onToggle={handleOnToggle}/>
+          <Sidebar checkoutForm={checkoutForm} shoppingCart={shoppingCart} isOpen={isOpen} onToggle={handleOnToggle} onCheckoutFormChange={handleOnCheckoutFormChange} onSubmitCheckoutForm={handleOnSubmitCheckoutForm} />
           <Routes>
-            <Route path="/" element={<Home products={products} addItemToCart={handleAddItemToCart} removeItemFromCart={handleRemoveItemFromCart}/>} />
+            <Route path="/" element={<Home shoppingCart={shoppingCart} products={products} addItemToCart={handleAddItemToCart} removeItemFromCart={handleRemoveItemFromCart}/>} />
             <Route path="/products/:productId" element={<ProductDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>             
