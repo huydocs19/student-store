@@ -3,17 +3,17 @@ import axios from "axios"
 import { useParams } from "react-router-dom"
 import NotFound from "../NotFound/NotFound"
 import ProductView from "../ProductView/ProductView"
-
+import "./ProductDetail.css"
 
 export default function ProductDetail(props) {
   const [product, setProduct] = React.useState(null)
-  const [loading, setLoading] = React.useState(true)
+  const [loading, setLoading] = React.useState(true)  
   let {productId} = useParams()
   const getProductQuantity = (productId) => {
-    const item = props.shoppingCart.products.find((item) => item.itemId == productId)
-    if (item) {
+    const item = props.shoppingCart.products.find((item) => item.itemId == productId)    
+    if (item) {      
       return item.quantity
-    }
+    }   
     return 0
   }
   React.useEffect(() => {    
@@ -25,13 +25,17 @@ export default function ProductDetail(props) {
       } 
     })
     .catch(function (error) {
-      console.log(error)
+      setLoading(false) 
     });
   }, []);
   return (
     <div className="product-detail">
-      {loading && <h1 className="loading">Loading...</h1>}
-      {!loading && product ? <ProductView product={product} productId={product.id} quantity={getProductQuantity(product.id)} addItemToCart={props.addItemToCart} removeItemFromCart={props.removeItemFromCart}/>:<NotFound />}
+      {loading ? 
+        <h1 className="loading">Loading...</h1>:
+        product ?
+        <ProductView product={product} productId={product.id} quantity={getProductQuantity(product.id)} addItemToCart={props.addItemToCart} removeItemFromCart={props.removeItemFromCart}/>:
+        <NotFound />
+      }
     </div>
   )
 }

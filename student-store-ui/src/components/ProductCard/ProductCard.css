@@ -48,14 +48,14 @@
     flex-direction: column;
     justify-content: space-around
 }
-.product-card .quantity {
+.product-card .product-quantity {
     width: 80px;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
     padding: 5px
 }
-.product-card .quantity .amt {
+.product-card .product-quantity .amt {
     background: var(--accent-orange);
     color: #fff;
     width: 20px;

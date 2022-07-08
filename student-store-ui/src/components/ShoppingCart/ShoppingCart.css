@@ -1,6 +1,6 @@
 .shopping-cart {
     width: 100%;
-    color: #fff
+    color: #fff;    
 }
 .shopping-cart .open {
     max-width: 550px
@@ -30,11 +30,11 @@
 .shopping-cart .cart-icon {
     margin-bottom: 16px
 }
-.shopping-cart .CartTable {
+.shopping-cart .cart-table {
     width: 100%;
     margin: 0 10px
 }
-.shopping-cart .CartTable .header {
+.shopping-cart .cart-table .header {
     display: flex;
     flex-direction: column;
     background: var(--pure-white);

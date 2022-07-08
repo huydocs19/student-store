@@ -1,14 +1,15 @@
 import * as React from "react"
+import "./CheckoutForm.css"
 
 export default function CheckoutForm(props) {
   return (
     <div className="checkout-form">
-        <h3 className="">Payment Info <span className="button"><i className="material-icons md-48">monetization_on</i></span>
+        <h3>Payment Info <span className="button"><i className="material-icons md-48">monetization_on</i></span>
         </h3>
         <div className="input-field">
             <label className="label">Name</label>
             <div className="control ">
-                <input name="name" className="checkout-form-input" type="text" placeholder="Student Name" value={props.checkoutForm.mame} onChange={(event) => props.onCheckoutFormChange(event.target.name, event.target.value)}/>
+                <input name="name" className="checkout-form-input" type="text" placeholder="Student Name" value={props.checkoutForm.name} onChange={(event) => props.onCheckoutFormChange(event.target.name, event.target.value)}/>
             </div>
         </div>
         <div className="input-field">
@@ -24,10 +25,10 @@ export default function CheckoutForm(props) {
                 </label>
             </div>
         </div>
-        <p className="is-danger"></p>
+        <p className="is-danger">{(props.error.type == "NO_CART_ERROR" || props.error.type == "NO_USER_INFO_ERROR") && props.error.message}</p>
         <div className="field">
             <div className="control">
-                <button className="button checkout-button" onSubmit={props.onSubmitCheckoutForm}>Checkout</button>
+                <button className="button checkout-button" onClick={props.onSubmitCheckoutForm}>Checkout</button>
             </div>
         </div>
     </div>
