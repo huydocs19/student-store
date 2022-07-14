@@ -1,0 +1,89 @@
+.orders {
+    display: flex;
+    justify-content: center; 
+    margin-top: 40px; 
+}
+.orders .search-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 1;
+    margin-right: 40px;
+  } 
+.orders .search-bar input {
+    height: 40px;
+    padding: 0 15px;
+    border-radius: 8px 0 0 8px;
+    border: solid 1px #e4e4e4;
+    flex: 1;
+    font-size: 16px;
+}
+.orders .search-bar div{
+    height: 40px;
+    width: 40px;
+    background: var(--bright-green);
+    color: #fff;
+    fill: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.orders .order-table {
+    display: flex;
+    flex-direction: column;  
+    min-width: 40%;    
+}
+.orders .order-table h2 {
+    color: black;
+    margin-bottom: 24px;
+    font-size: 28px;
+    margin-top: 40px;
+}
+.orders .order-table .table {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 1px solid rgba(196, 196, 196, 0.3);
+}
+  
+.orders .order-table .table .table-row {
+    display: flex;
+    flex-direction: row;
+    height: 80px;
+    width: 100%;
+    border-bottom: 1px solid rgba(196, 196, 196, 0.3);
+    background: white;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.orders .order-table .table .table-row:hover {
+    background: #f3fffb;
+}
+.orders .order-table .table .table-row.table-header .col {
+    background: rgba(44, 64, 71, 1);
+    color: white;
+}
+.orders .order-table .table .table-row .col {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 80px;
+    padding: 25px;
+    color: rgba(44, 65, 71, 1);
+    font-weight: 600;
+}
+.orders .order-table .table .table-row .col.x10 {
+    width: 10%;
+}
+.orders .order-table .table .table-row .col.x20 {
+    width: 20%;
+}
+.orders .order-table .table .table-row .col.x25 {
+    width: 25%;
+}
+.orders .order-table .table .table-row .col.x30 {
+    width: 30%;
+}
+ 
+  

@@ -4,7 +4,7 @@ import "./CheckoutInfo.css"
 export default function CheckoutInfo(props) {
   const exitCheckoutInfo = () => {
     props.setReceiptLines([])
-    if (props.error.type == "FORM_SUBMIT_ERROR") {
+    if (props.error?.type == "FORM_SUBMIT_ERROR") {
       props.setError({type: "", message:""})
     }
   }
@@ -13,18 +13,18 @@ export default function CheckoutInfo(props) {
       <h3>
         Checkout Info <span className="icon button"><i className="material-icons md-48">fact_check</i></span>
       </h3>
-      {props.error.type == "FORM_SUBMIT_ERROR" ?
-        <p className="is-danger">{props.error.message}</p>:
-        props.receiptLines.length > 0 ? 
+      {props.error?.type == "FORM_SUBMIT_ERROR" || props.error?.type == "NO_RECEIPT_ERROR"?
+        <p className="is-danger">{props.error?.message}</p>:
+        props.receiptLines?.length > 0 ? 
           <div className="card">
             <header className="card-head">
               <h4 className="card-title">Receipt</h4>
             </header>
             <section className="card-body">
-              <p className="header">Showing receipt for abc available at abc:</p>
+              <p className="header">{props.receiptLines[0]}</p>
               <ul className="purchase">
-                {props.receiptLines.map((line, idx) => (                  
-                  idx > 0 && <li>{line}</li>
+                {props.receiptLines?.map((line, idx) => (                  
+                  idx > 0 && <li key={idx}>{line}</li>
                 ))}
               </ul>
             </section>

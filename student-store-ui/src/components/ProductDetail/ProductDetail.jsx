@@ -7,30 +7,34 @@ import "./ProductDetail.css"
 
 export default function ProductDetail(props) {
   const [product, setProduct] = React.useState(null)
-  const [loading, setLoading] = React.useState(true)  
+  const [isLoading, setIsLoading] = React.useState(false)  
   let {productId} = useParams()
   const getProductQuantity = (productId) => {
-    const item = props.shoppingCart.products.find((item) => item.itemId == productId)    
+    const item = props.shoppingCart?.products?.find((item) => item.itemId == productId)    
     if (item) {      
       return item.quantity
     }   
     return 0
   }
-  React.useEffect(() => {    
-    axios.get(`https://codepath-store-api.herokuapp.com/store/${productId}`)
-    .then((response) => { 
-      setLoading(false)       
-      if (response.data) {
-        setProduct(response.data.product)
-      } 
-    })
-    .catch(function (error) {
-      setLoading(false) 
-    });
+  React.useEffect(() => {
+    const fetchProduct = async () => {
+      setIsLoading(true) 
+      axios.get(`http://localhost:3001/store/${productId}`)
+      .then((response) => {             
+        if (response?.data?.product) {
+          setProduct(response.data.product)
+        } 
+        setIsLoading(false) 
+      })
+      .catch(function (error) {
+        setIsLoading(false) 
+      });
+    } 
+    fetchProduct()
   }, []);
   return (
     <div className="product-detail">
-      {loading ? 
+      {isLoading ? 
         <h1 className="loading">Loading...</h1>:
         product ?
         <ProductView product={product} productId={product.id} quantity={getProductQuantity(product.id)} addItemToCart={props.addItemToCart} removeItemFromCart={props.removeItemFromCart}/>:

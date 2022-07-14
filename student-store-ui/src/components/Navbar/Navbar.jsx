@@ -20,10 +20,11 @@ export default function Navbar() {
           </svg>
         </div>
         <ul className="links">
-          <li><a href="/">Home</a></li>
+          <li><Link to="/">Home</Link></li>
           <li><a href="/#About">About Us</a></li>
           <li><a href="/#Contact">Contact Us</a></li>
           <li><a href="/#Buy">Buy Now</a></li>
+          <li><a href="/orders">Orders</a></li>
         </ul>
       </div>
       

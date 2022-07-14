@@ -5,7 +5,7 @@ const formatter = new Intl.NumberFormat('en-US', {
   currency: 'USD',
 });
 export default function CartTable(props) {
-  const tax = props.shoppingCart.totalPrice * 0.875 
+  const tax = props.shoppingCart?.totalPrice * 0.0875 
   return (
     <div className="cart-table">
       <div className="header">
@@ -15,8 +15,8 @@ export default function CartTable(props) {
             <span className="center">Unit Price</span>
             <span className="center">Cost</span>
         </div>
-        {props.shoppingCart.products.map((item, idx) => {
-          let product = props.products.find(element => element.id == item.itemId)          
+        {props.shoppingCart?.products?.map((item, idx) => {
+          let product = props.products?.find(element => element.id == item.itemId)          
           return (            
             <div className="product-row" key={idx}>                
                 <span className="flex-2 cart-product-name">{product.name}</span>
@@ -30,7 +30,7 @@ export default function CartTable(props) {
             <div className="receipt-subtotal">
                 <span className="label">Subtotal</span>
                 <span></span><span></span>
-                <span className="center subtotal">{formatter.format(props.shoppingCart.totalPrice)}</span>
+                <span className="center subtotal">{formatter.format(props.shoppingCart?.totalPrice)}</span>
                 </div>
             <div className="receipt-taxes">
                 <span className="label">Taxes and Fees</span>
@@ -40,7 +40,7 @@ export default function CartTable(props) {
             <div className="receipt-total">
                 <span className="label">Total</span>
                 <span></span><span></span>
-                <span className="center total-price">{formatter.format(props.shoppingCart.totalPrice + tax)}</span>
+                <span className="center total-price">{formatter.format(props.shoppingCart?.totalPrice + tax)}</span>
             </div>
         </div>
     </div>

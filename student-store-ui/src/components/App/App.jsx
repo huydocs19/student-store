@@ -13,13 +13,15 @@ import ProductDetail from "../ProductDetail/ProductDetail"
 import NotFound from "../NotFound/NotFound"
 import Hero from "../Hero/Hero"
 import SubNavBar from "../SubNavBar/SubNavBar"
+import Orders from "../Orders/Orders"
 import "./App.css"
+import OrderDetail from "../OrderDetail/OrderDetail"
 
-const baseURL = "https://codepath-store-api.herokuapp.com/store";
+const baseURL = "http://localhost:3001/store";
 export default function App() {
   const [products, setProducts] = React.useState([])
   const [allProducts, setAllProducts] = React.useState([])
-  const [isFetching, setIsFetching] = React.useState(true)
+  const [isFetching, setIsFetching] = React.useState(false)
   const [error, setError] = React.useState({type: "", message:""})
   const [isOpen, setIsOpen] = React.useState(false)
   const [shoppingCart, setShoppingCart] = React.useState({totalPrice: 0, products: []})
@@ -27,30 +29,37 @@ export default function App() {
   const [receiptLines, setReceiptLines] = React.useState([])
   const [searchTerm, setSearchTerm] = React.useState("")  
   React.useEffect(() => {
-    axios.get(baseURL)
-    .then((response) => {  
-      setIsFetching(false)      
-      if (!response.data || response.data.products.length == 0) {
-        setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
-      } else {
-        setProducts(response.data.products)
-        setAllProducts(response.data.products) 
-      }      
-    })
-    .catch(function (error) {
-      setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
-    });
+    const fetchProducts = async () => {
+      setIsFetching(true) 
+      axios.get(baseURL)
+      .then((response) => {               
+          if (response?.data?.products?.length > 0) {
+            setProducts(response.data.products)
+            setAllProducts(response.data.products) 
+            setError({type: "", message:""})        
+          } else {
+            setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
+          }
+          setIsFetching(false)         
+        })
+        .catch(function (error) {
+          setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
+          setIsFetching(false)
+        });
+    }
+    fetchProducts()
   }, []);
+
   const handleOnToggle = () => {
     setIsOpen(!isOpen)
   }
   const handleAddItemToCart = (productId) => {    
     const product = products.find(element => element.id == productId)     
     if (product) {
-      const item = shoppingCart.products.find(element => element.itemId == productId)
+      const item = shoppingCart.products?.find(element => element.itemId == productId)
       const newTotalPrice = shoppingCart.totalPrice + product.price  
       if (item) {      
-        const updatedProducts = shoppingCart.products.map(element => {          
+        const updatedProducts = shoppingCart.products?.map(element => {          
           if (element.itemId == productId) {
             return {...element, quantity: element.quantity + 1}
           }
@@ -72,14 +81,14 @@ export default function App() {
   const handleRemoveItemFromCart = (productId) => {
     const product = products.find(element => element.id == productId)
     if (product) {
-      const item = shoppingCart.products.find(element=> element.itemId == productId)      
+      const item = shoppingCart.products?.find(element=> element.itemId == productId)      
       if (item) {
         const newTotalPrice = shoppingCart.totalPrice - product.price      
         let updatedProducts
         if (item.quantity <= 1) {
-          updatedProducts = shoppingCart.products.filter(element => element.itemId != productId)
+          updatedProducts = shoppingCart.products?.filter(element => element.itemId != productId)
         } else {
-          updatedProducts = shoppingCart.products.map(element => {          
+          updatedProducts = shoppingCart.products?.map(element => {          
             if (element.itemId == productId) {
               return {...element, quantity: element.quantity - 1}
             }
@@ -96,7 +105,7 @@ export default function App() {
     setCheckoutForm({...checkoutForm, [name]: value})
   }
   const handleOnSubmitCheckoutForm = (event) => {    
-    if (shoppingCart.products.length < 1) {      
+    if (!shoppingCart.products || shoppingCart.products.length < 1) {      
       setError({type: "NO_CART_ERROR", message:"No cart or items in cart found to checkout."})
     } else if (!checkoutForm.name || !checkoutForm.email) {
       
@@ -111,10 +120,17 @@ export default function App() {
       }).then((response) => {        
         setShoppingCart({totalPrice: 0, products: []})
         setCheckoutForm({name: "", email: ""})
-        setReceiptLines(curr => response.data.purchase.receipt.lines)
         if (error.type == "NO_CART_ERROR" || error.type == "NO_USER_INFO_ERROR") {
           setError({type: "", message:""})
         } 
+        if (response?.data?.purchase?.receipt?.lines) {
+          setReceiptLines(curr => response.data.purchase.receipt.lines)
+          if (error.type == "NO_RECEIPT_ERROR") {
+            setError({type: "", message:""})
+          }       
+        } else {
+          setError({type: "NO_RECEIPT_ERROR", message:"No Receipt Available"})
+        }
       }).catch(function (error) {
         setError({type: "FORM_SUBMIT_ERROR", message:"Cannot Submit Your Order"});
       });
@@ -161,13 +177,25 @@ export default function App() {
         <main>
           {/* YOUR CODE HERE! */}  
           <Sidebar setError={setError} setIsOpen={setIsOpen} setReceiptLines={setReceiptLines} error={error} receiptLines={receiptLines} products={products} checkoutForm={checkoutForm} shoppingCart={shoppingCart} isOpen={isOpen} onToggle={handleOnToggle} onCheckoutFormChange={handleOnCheckoutFormChange} onSubmitCheckoutForm={handleOnSubmitCheckoutForm} />
-          <Navbar />  
-          <Hero/>
-          <SubNavBar onToggle={handleOnToggle} searchTerm={searchTerm} onSearchTermChange={handleOnSearchTermChange} searchProduct={handleProductSearch} changeCategory={handleCategoryChange}/>               
+          <Navbar />          
           <Routes>
-            <Route path="/" element={<Home error={error} isFetching={isFetching} shoppingCart={shoppingCart} products={products} addItemToCart={handleAddItemToCart} removeItemFromCart={handleRemoveItemFromCart}/>} />
-            <Route path="/products/:productId" element={<ProductDetail shoppingCart={shoppingCart} addItemToCart={handleAddItemToCart} removeItemFromCart={handleRemoveItemFromCart}/>} /> 
-                        
+            <Route path="/" element={
+              <div>
+                <Hero/>
+                <SubNavBar onToggle={handleOnToggle} searchTerm={searchTerm} onSearchTermChange={handleOnSearchTermChange} searchProduct={handleProductSearch} changeCategory={handleCategoryChange}/>               
+                <Home error={error} isFetching={isFetching} shoppingCart={shoppingCart} products={products} addItemToCart={handleAddItemToCart} removeItemFromCart={handleRemoveItemFromCart}/>
+              </div>            
+            } />
+            <Route path="/products/:productId" element={
+              <div>
+                <Hero/>
+                <SubNavBar onToggle={handleOnToggle} searchTerm={searchTerm} onSearchTermChange={handleOnSearchTermChange} searchProduct={handleProductSearch} changeCategory={handleCategoryChange}/>
+                <ProductDetail shoppingCart={shoppingCart} addItemToCart={handleAddItemToCart} removeItemFromCart={handleRemoveItemFromCart}/>
+              </div>            
+            } /> 
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/orders/:orderId" element={<OrderDetail />} />
+            <Route path="*" element={<NotFound/>}/>          
           </Routes>                     
         </main>
       </BrowserRouter>

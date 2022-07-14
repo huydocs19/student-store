@@ -9,13 +9,13 @@ export default function CheckoutForm(props) {
         <div className="input-field">
             <label className="label">Name</label>
             <div className="control ">
-                <input name="name" className="checkout-form-input" type="text" placeholder="Student Name" value={props.checkoutForm.name} onChange={(event) => props.onCheckoutFormChange(event.target.name, event.target.value)}/>
+                <input name="name" className="checkout-form-input" type="text" placeholder="Student Name" value={props.checkoutForm?.name} onChange={(event) => props.onCheckoutFormChange(event.target?.name, event.target?.value)}/>
             </div>
         </div>
         <div className="input-field">
             <label className="label">Email</label>
             <div className="control">
-                <input name="email" className="checkout-form-input" type="email" placeholder="student@codepath.org" value={props.checkoutForm.email} onChange={(event) => props.onCheckoutFormChange(event.target.name, event.target.value)}/>
+                <input name="email" className="checkout-form-input" type="email" placeholder="student@codepath.org" value={props.checkoutForm?.email} onChange={(event) => props.onCheckoutFormChange(event.target?.name, event.target?.value)}/>
             </div>
         </div>
         <div className="field">
@@ -25,7 +25,7 @@ export default function CheckoutForm(props) {
                 </label>
             </div>
         </div>
-        <p className="is-danger">{(props.error.type == "NO_CART_ERROR" || props.error.type == "NO_USER_INFO_ERROR") && props.error.message}</p>
+        <p className="is-danger">{(props.error?.type == "NO_CART_ERROR" || props.error?.type == "NO_USER_INFO_ERROR") && props.error?.message}</p>
         <div className="field">
             <div className="control">
                 <button className="button checkout-button" onClick={props.onSubmitCheckoutForm}>Checkout</button>

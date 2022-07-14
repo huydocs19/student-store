@@ -9,7 +9,7 @@ export default function SubNavBar(props) {
         <div className="content">
             <div className="row">
                 <div className="search-bar">
-                    <input type="text" name="search" placeholder="Search" value={props.searchTerm} onChange={(event) => props.onSearchTermChange(event.target.value)}/>
+                    <input type="text" name="search" placeholder="Search" value={props.searchTerm} onChange={(event) => props.onSearchTermChange(event.target?.value)}/>
                     <div onClick={props.searchProduct}><i className="material-icons">search</i></div>
                 </div>
                 <div className="links">
