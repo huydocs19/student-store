@@ -23,9 +23,9 @@ Selling merchandise in the modern era requires digital solutions. For this proje
 - Allow users to use an input to filter orders by the email of the person who placed the order.
 
 ### Walkthrough Video
-<img src="walkthrough1.gif" width=900><br>
-<img src="walkthrough2.gif" width=900><br>
-<img src="walkthrough3.gif" width=900><br>
-<img src="walkthrough4.gif" width=900><br>
+<img src="walkthrough1.gif" width=800><br>
+<img src="walkthrough2.gif" width=800><br>
+<img src="walkthrough3.gif" width=800><br>
+<img src="walkthrough4.gif" width=800><br>
 
 ### Tech Stack Used: React, Node, Express
