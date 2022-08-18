@@ -1,5 +1,7 @@
 # Project #2: Student Store
 
+### Deployed Application: [Student Store Deployed Site](https://cal-student-store.surge.sh/)
+
 ## Overview
 
 Selling merchandise in the modern era requires digital solutions. For this project, I designed and constructed an online student store for the College of Codepath. The application entails a frontend user interface for potential customers to peruse the goods, and a backend API to handle data management. The API will be built with Node and Express and the UI will be built with React.
@@ -23,7 +25,9 @@ Selling merchandise in the modern era requires digital solutions. For this proje
 - Allow users to use an input to filter orders by the email of the person who placed the order.
 
 ### Walkthrough Video
-<img src="walkthrough1.gif" width=1000><br>
-<img src="walkthrough2.gif" width=1000><br>
-<img src="walkthrough3.gif" width=1000><br>
-<img src="walkthrough4.gif" width=1000><br>
+<img src="walkthrough1.gif" width=800><br>
+<img src="walkthrough2.gif" width=800><br>
+<img src="walkthrough3.gif" width=800><br>
+<img src="walkthrough4.gif" width=800><br>
+
+### Tech Stack Used: React, Node, Express
