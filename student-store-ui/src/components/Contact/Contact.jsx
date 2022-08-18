@@ -1,3 +1,4 @@
+import happy_person from "../../assets/happy_person.svg"
 import * as React from "react"
 import "./Contact.css"
 
@@ -32,7 +33,7 @@ export default function Contact() {
                     </li>
                 </ul>
                 <div className="media">
-                    <img src="/assets/happy_person.svg" alt="codepath large"/>
+                    <img src={happy_person} alt="codepath large"/>
                 </div>
             </div>
         </div>

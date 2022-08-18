@@ -31,11 +31,11 @@ export default function OrderDetail(props) {
           })
         }    
         fetchOrderById() 
-      }, []); 
+      }, [orderId]); 
     return (
         <div className="order-detail">
             {isLoading?<h1>Loading...</h1>: 
-                error.type == "NO_ORDERS_ERROR"? <h2 className="error">{error.message}</h2>:
+                error.type === "NO_ORDERS_ERROR"? <h2 className="error">{error.message}</h2>:
                 <OrderDetailTable order={order}/>
             }
         </div>

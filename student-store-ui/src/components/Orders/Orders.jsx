@@ -52,7 +52,7 @@ export default function Orders() {
   return (
     <div className="orders">        
         {isLoading?<h1>Loading...</h1>: 
-            error.type == "NO_ORDERS_ERROR"? <h2 className="error">{error.message}</h2>:
+            error.type === "NO_ORDERS_ERROR"? <h2 className="error">{error.message}</h2>:
             <OrderTable orders={filteredOrders} searchTerm={searchTerm} searchOrder={handleOrderSearch} onSearchTermChange={handleOnSearchTermChange}/>
         }
     </div>

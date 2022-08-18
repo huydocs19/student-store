@@ -24,23 +24,23 @@ export default function SubNavBar(props) {
                     <i className="material-icons">menu</i>
                 </div>
                 <ul className={`category-menu ${isOpen ? "open" : "closed"}`}>
-                    <li className={category == "all"? "is-active": ""}><button onClick={() => {                        
+                    <li className={category === "all"? "is-active": ""}><button onClick={() => {                        
                         props.changeCategory("all")
                         setCategory("all")
                     }}>All Categories</button></li>
-                    <li className={category == "clothing"? "is-active": ""}><button onClick={() => {
+                    <li className={category === "clothing"? "is-active": ""}><button onClick={() => {
                         props.changeCategory("clothing")
                         setCategory("clothing")
                     }}>Clothing</button></li>
-                    <li className={category == "food"? "is-active": ""}><button onClick={() => {
+                    <li className={category === "food"? "is-active": ""}><button onClick={() => {
                         props.changeCategory("food")
                         setCategory("food")
                     }}>Food</button></li>
-                    <li className={category == "accessories"? "is-active": ""}><button onClick={() => {
+                    <li className={category === "accessories"? "is-active": ""}><button onClick={() => {
                         props.changeCategory("accessories")
                         setCategory("accessories")
                     }}>Accessories</button></li>
-                    <li className={category == "tech"? "is-active": ""}><button onClick={() => {
+                    <li className={category === "tech"? "is-active": ""}><button onClick={() => {
                         props.changeCategory("tech")
                         setCategory("tech")
                     }}>Tech</button></li>

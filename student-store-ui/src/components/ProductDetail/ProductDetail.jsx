@@ -10,7 +10,7 @@ export default function ProductDetail(props) {
   const [isLoading, setIsLoading] = React.useState(false)  
   let {productId} = useParams()
   const getProductQuantity = (productId) => {
-    const item = props.shoppingCart?.products?.find((item) => item.itemId == productId)    
+    const item = props.shoppingCart?.products?.find((item) => item.itemId === productId)    
     if (item) {      
       return item.quantity
     }   
@@ -31,7 +31,7 @@ export default function ProductDetail(props) {
       });
     } 
     fetchProduct()
-  }, []);
+  }, [productId]);
   return (
     <div className="product-detail">
       {isLoading ? 

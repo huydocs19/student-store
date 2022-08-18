@@ -25,7 +25,7 @@ export default function CheckoutForm(props) {
                 </label>
             </div>
         </div>
-        <p className="is-danger">{(props.error?.type == "NO_CART_ERROR" || props.error?.type == "NO_USER_INFO_ERROR") && props.error?.message}</p>
+        <p className="is-danger">{(props.error?.type === "NO_CART_ERROR" || props.error?.type === "NO_USER_INFO_ERROR") && props.error?.message}</p>
         <div className="field">
             <div className="control">
                 <button className="button checkout-button" onClick={props.onSubmitCheckoutForm}>Checkout</button>

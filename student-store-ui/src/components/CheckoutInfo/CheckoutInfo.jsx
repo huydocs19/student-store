@@ -4,7 +4,7 @@ import "./CheckoutInfo.css"
 export default function CheckoutInfo(props) {
   const exitCheckoutInfo = () => {
     props.setReceiptLines([])
-    if (props.error?.type == "FORM_SUBMIT_ERROR") {
+    if (props.error?.type === "FORM_SUBMIT_ERROR") {
       props.setError({type: "", message:""})
     }
   }
@@ -13,7 +13,7 @@ export default function CheckoutInfo(props) {
       <h3>
         Checkout Info <span className="icon button"><i className="material-icons md-48">fact_check</i></span>
       </h3>
-      {props.error?.type == "FORM_SUBMIT_ERROR" || props.error?.type == "NO_RECEIPT_ERROR"?
+      {props.error?.type === "FORM_SUBMIT_ERROR" || props.error?.type === "NO_RECEIPT_ERROR"?
         <p className="is-danger">{props.error?.message}</p>:
         props.receiptLines?.length > 0 ? 
           <div className="card">

@@ -1,4 +1,10 @@
 import * as React from "react"
+import app_store from "../../assets/app_store.svg"
+import google_play from "../../assets/google_play.svg"
+import american_express from "../../assets/american_express.svg"
+import mastercard from "../../assets/mastercard.svg"
+import paypal from "../../assets/paypal.svg"
+import visa from "../../assets/visa.svg"
 import "./Footer.css"
 
 export default function Footer() {
@@ -60,10 +66,10 @@ export default function Footer() {
                 <h4>Our App</h4>
                 <ul>
                     <li>
-                    <img src="/assets/app_store.svg" alt="app store"/>
+                    <img src={app_store} alt="app store"/>
                     </li>
                     <li>
-                    <img src="/assets/google_play.svg" alt="google play store"/>
+                    <img src={google_play} alt="google play store"/>
                     </li>
                 </ul>
                 </div>
@@ -71,10 +77,10 @@ export default function Footer() {
             </div>
             <div className="bottom">
             <span className="payment-options">
-                <img src="/assets/american_express.svg" alt="american express"/>
-                <img src="/assets/mastercard.svg" alt="mastercard"/>
-                <img src="/assets/paypal.svg" alt="paypal"/>
-                <img src="/assets/visa.svg" alt="visa"/>
+                <img src={american_express} alt="american express"/>
+                <img src={mastercard} alt="mastercard"/>
+                <img src={paypal} alt="paypal"/>
+                <img src={visa} alt="visa"/>
             </span>
             </div>
         </div>

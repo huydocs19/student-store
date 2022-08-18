@@ -16,7 +16,7 @@ export default function CartTable(props) {
             <span className="center">Cost</span>
         </div>
         {props.shoppingCart?.products?.map((item, idx) => {
-          let product = props.products?.find(element => element.id == item.itemId)          
+          let product = props.products?.find(element => element.id === item.itemId)          
           return (            
             <div className="product-row" key={idx}>                
                 <span className="flex-2 cart-product-name">{product.name}</span>

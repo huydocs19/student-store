@@ -3,8 +3,7 @@ import axios from "axios"
 import {
   BrowserRouter,
   Routes,
-  Route,
-  Link
+  Route
 } from 'react-router-dom'
 import Navbar from "../Navbar/Navbar"
 import Sidebar from "../Sidebar/Sidebar"
@@ -54,13 +53,13 @@ export default function App() {
     setIsOpen(!isOpen)
   }
   const handleAddItemToCart = (productId) => {    
-    const product = products.find(element => element.id == productId)     
+    const product = products.find(element => element.id === productId)     
     if (product) {
-      const item = shoppingCart.products?.find(element => element.itemId == productId)
+      const item = shoppingCart.products?.find(element => element.itemId === productId)
       const newTotalPrice = shoppingCart.totalPrice + product.price  
       if (item) {      
         const updatedProducts = shoppingCart.products?.map(element => {          
-          if (element.itemId == productId) {
+          if (element.itemId === productId) {
             return {...element, quantity: element.quantity + 1}
           }
           return element
@@ -79,17 +78,17 @@ export default function App() {
     }
   }
   const handleRemoveItemFromCart = (productId) => {
-    const product = products.find(element => element.id == productId)
+    const product = products.find(element => element.id === productId)
     if (product) {
-      const item = shoppingCart.products?.find(element=> element.itemId == productId)      
+      const item = shoppingCart.products?.find(element=> element.itemId === productId)      
       if (item) {
         const newTotalPrice = shoppingCart.totalPrice - product.price      
         let updatedProducts
         if (item.quantity <= 1) {
-          updatedProducts = shoppingCart.products?.filter(element => element.itemId != productId)
+          updatedProducts = shoppingCart.products?.filter(element => element.itemId !== productId)
         } else {
           updatedProducts = shoppingCart.products?.map(element => {          
-            if (element.itemId == productId) {
+            if (element.itemId === productId) {
               return {...element, quantity: element.quantity - 1}
             }
             return element
@@ -120,12 +119,12 @@ export default function App() {
       }).then((response) => {        
         setShoppingCart({totalPrice: 0, products: []})
         setCheckoutForm({name: "", email: ""})
-        if (error.type == "NO_CART_ERROR" || error.type == "NO_USER_INFO_ERROR") {
+        if (error.type === "NO_CART_ERROR" || error.type === "NO_USER_INFO_ERROR") {
           setError({type: "", message:""})
         } 
         if (response?.data?.purchase?.receipt?.lines) {
           setReceiptLines(curr => response.data.purchase.receipt.lines)
-          if (error.type == "NO_RECEIPT_ERROR") {
+          if (error.type === "NO_RECEIPT_ERROR") {
             setError({type: "", message:""})
           }       
         } else {
@@ -139,18 +138,18 @@ export default function App() {
     
   }
   const handleCategoryChange = (category) => {
-    if (category == "all") {      
+    if (category === "all") {      
       setProducts(allProducts)
       if (allProducts.length < 1) {
         setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
-      } else if (error.type == "NO_PRODUCTS_ERROR") {
+      } else if (error.type === "NO_PRODUCTS_ERROR") {
         setError({type: "", message:""})
       }
     } else {
-      const updatedProducts = allProducts.filter(element => element.category == category)
+      const updatedProducts = allProducts.filter(element => element.category === category)
       if (updatedProducts.length < 1) {
         setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
-      } else if (error.type == "NO_PRODUCTS_ERROR") {
+      } else if (error.type === "NO_PRODUCTS_ERROR") {
         setError({type: "", message:""})
       }
       setProducts(updatedProducts)
@@ -160,7 +159,7 @@ export default function App() {
     const updatedProducts = allProducts.filter(element => element.name.toLowerCase().includes(searchTerm.toLowerCase()))
     if (updatedProducts.length < 1) {
       setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
-    } else if (error.type == "NO_PRODUCTS_ERROR") {
+    } else if (error.type === "NO_PRODUCTS_ERROR") {
       setError({type: "", message:""})
     }
     setProducts(updatedProducts)
