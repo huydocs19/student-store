@@ -1,101 +1,122 @@
-import * as React from "react"
-import axios from "axios"
-import {Link} from "react-router-dom"
+import {useState, useEffect} from "react"
+import apiClient from "../../services/apiClient"
+import { Footer, NavBar } from "components"
+import { formatPrice } from "../../utils/format"
+import {
+  calculateOrderSubtotal,
+  calculateItemSubtotal,
+  calculateTaxesAndFees,
+  calculateTotal,
+} from "../../utils/calculations"
 import "./Orders.css"
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {})
-const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  });
-export default function Orders() {
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [orders, setOrders] = React.useState([]) 
-  const [searchTerm, setSearchTerm] = React.useState("") 
-  const [error, setError] = React.useState({type: "", message: ""})
-  const [filteredOrders, setFilteredOrders] = React.useState([])
-  React.useEffect(() => {    
+const groupOrderDetailsByOrderId = (orderDetails) => {
+  // get an array of unique order ids
+  const orderIds = [...new Set(orderDetails.map((d) => d.orderId))]
+
+  return orderIds.reduce((acc, orderId) => {
+    acc[orderId] = orderDetails.filter((d) => d.orderId === orderId)
+    return acc
+  }, {})
+}
+
+export default function Orders({
+  user,  
+  orders,
+  setOrders,
+  handleLogout, 
+}) {  
+  const [isFetching, setIsFetching] = useState(false)
+  // const ordersMapping = groupOrderDetailsByOrderId(orders)
+  useEffect(() => {
     const fetchOrders = async () => {
-      setIsLoading(true)
-      axios.get('http://localhost:3001/store/orders')
-        .then(function (response) {
-          const orders = response?.data?.purchases          
-          if (orders) {
-            setOrders(orders) 
-            setFilteredOrders(orders)
-            setError({type: "", message: ""})
-          } else {
-            setError({type: "NO_ORDERS_ERROR", message: "No orders available"})
-          }
-          setIsLoading(false)          
-      }).catch(function (error) {        
-        setError({type: "NO_ORDERS_ERROR", message: "No orders available"})
-        setIsLoading(false)
-      })
-    }    
-    fetchOrders()   
-    
-  }, []); 
-  const handleOrderSearch = () => {
-    const filterOrders = orders.filter(element => element.email?.toLowerCase().includes(searchTerm.toLowerCase()))
-    if (filterOrders.length < 1) {
-      setError({type: "NO_ORDERS_ERROR", message: "No orders available"})
-    } else {
-      setError({type: "", message: ""})
+      setIsFetching(true)
+
+      const {data} = await apiClient.fetchOrderList()     
+      
+      if (data?.orders) { 
+        const ordersMapping = groupOrderDetailsByOrderId(data.orders)       
+        setOrders(ordersMapping)    
+      } 
+      setIsFetching(false)
     }
-    setFilteredOrders(filterOrders)
-    setSearchTerm("")
-  }
-  const handleOnSearchTermChange = (text) => {
-    setSearchTerm(text)
-  } 
+
+    fetchOrders()
+  }, [])
+  const hasOrders = Boolean(Object.keys(orders)?.length)
+
   return (
-    <div className="orders">        
-        {isLoading?<h1>Loading...</h1>: 
-            error.type === "NO_ORDERS_ERROR"? <h2 className="error">{error.message}</h2>:
-            <OrderTable orders={filteredOrders} searchTerm={searchTerm} searchOrder={handleOrderSearch} onSearchTermChange={handleOnSearchTermChange}/>
-        }
+    <div className="orders">
+      <NavBar user={user} handleLogout={handleLogout}/>      
+      <div className="banner">
+        <div className="content">
+          <h2>Orders</h2>
+        </div>
+      </div>
+
+      <div className="content">
+        <div className="order-list">
+          <div className="order-list-header">
+            <span>Order</span>
+            <span className="flex-2">Name</span>
+            <span className="center">Quantity</span>
+            <span className="center">Unit Price</span>
+            <span className="center">Cost</span>
+          </div>
+
+          {Object.keys(orders)?.map((orderId) => (
+            <OrderItem key={orderId} orderId={orderId} orderItems={orders[orderId]} />
+          ))}
+
+          {!hasOrders ? (
+            <div className="order-item">
+              <p>You haven't placed any orders yet.</p>
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <Footer />
     </div>
   )
 }
-export function OrderTable(props) {
-    return ( 
-        <div className="order-table">
-            <div className="search-bar">
-                    <input type="text" name="search" placeholder="Search Order By Email" value={props.searchTerm} onChange={(event) => props.onSearchTermChange(event.target?.value)}/>
-                    <div onClick={props.searchOrder}><i className="material-icons">search</i></div>
-            </div>
-            <h2>Orders</h2>
-            <div className="table">
-                <div className="table-header table-row">
-                    <span className="col x10">ID</span>
-                    <span className="col x20">Name</span>
-                    <span className="col x30">Email</span>
-                    <span className="col x20">Total Cost</span>
-                    <span className="col x20">Date</span>
-                </div>
-                {props.orders?.map((item, idx) => (
-                <OrderRow order={item} key={idx}/>
-                ))}
-            </div> 
-            
-        </div>       
-         
-    )
-}
-export function OrderRow(props) {
-    const formatDate = (date) => {
-        const d = date ? new Date(date) : null
-        return d instanceof Date ? dateFormatter.format(d) : ""
-    }
-    return ( 
-        <Link className="table-row order-row" to={`/orders/${props.order?.id}`}>
-            <span className="col x10">{props.order?.id}</span>
-            <span className="col x20">{props.order?.name}</span>
-            <span className="col x30">{props.order?.email}</span>
-            <span className="col x20">{formatter.format(props.order?.total)}</span>
-            <span className="col x20">{formatDate(props.order?.createdAt)}</span>
-        </Link> 
-         
-    )
+
+const OrderItem = ({ orderItems, orderId }) => {
+  const subTotal = calculateOrderSubtotal(orderItems)
+
+  return (
+    <div className="order-item" key={orderId}>
+      <h3>Order #{orderId}</h3>
+      <div className="order-details">
+        {orderItems.map((item) => (
+          <div key={`${orderId}-${item.name}`} className="line-item">
+            <span className="flex-2">{item.name}</span>
+            <span className="center">{item.quantity}</span>
+            <span className="center">{formatPrice(item.price)}</span>
+            <span className="center">{formatPrice(calculateItemSubtotal(item.price, item.quantity))}</span>
+          </div>
+        ))}
+        <div className="receipt">
+          <div className="receipt-subtotal">
+            <span className="label">Subtotal</span>
+            <span />
+            <span />
+            <span className="center">{formatPrice(subTotal)}</span>
+          </div>
+          <div className="receipt-taxes">
+            <span className="label">Taxes and Fees</span>
+            <span />
+            <span />
+            <span className="center">{formatPrice(calculateTaxesAndFees(subTotal))}</span>
+          </div>
+          <div className="receipt-total">
+            <span className="label">Total</span>
+            <span />
+            <span />
+            <span className="center">{formatPrice(calculateTotal(subTotal))}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }

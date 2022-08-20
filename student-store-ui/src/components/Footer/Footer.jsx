@@ -1,4 +1,3 @@
-import * as React from "react"
 import app_store from "../../assets/app_store.svg"
 import google_play from "../../assets/google_play.svg"
 import american_express from "../../assets/american_express.svg"

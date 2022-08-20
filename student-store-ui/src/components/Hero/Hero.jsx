@@ -1,4 +1,3 @@
-import * as React from "react"
 import student_store_icon from "../../assets/student_store_icon.svg"
 import "./Hero.css"
 

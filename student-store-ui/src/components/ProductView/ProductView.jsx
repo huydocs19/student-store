@@ -1,12 +1,18 @@
 import * as React from "react"
-import ProductCard from "../ProductCard/ProductCard"
+import {ProductCard} from "components"
 
-export default function ProductView(props) {
+export default function ProductView({product, quantity, addToCart, removeFromCart}) {
   return (
     <div className="product-view">
-      <h1 className="product-id">Product #{props.productId}</h1>
+      <h1 className="product-id">Product #{product.id}</h1>
       <div className="product-view-card">
-      <ProductCard quantity={props.quantity} product={props.product} productId={props.productId} addItemToCart={props.addItemToCart} removeItemFromCart={props.removeItemFromCart} showDescription={true}/>
+      <ProductCard 
+        product={product} 
+        quantity={quantity} 
+        addToCart={() => addToCart(product)} 
+        removeFromCart={() => removeFromCart(product)} 
+        showDescription={true}
+      />
       </div>
       
     </div>

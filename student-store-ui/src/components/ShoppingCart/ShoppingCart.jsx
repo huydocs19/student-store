@@ -1,25 +1,142 @@
-import * as React from "react"
-import CartTable from "../CartTable/CartTable"
-import CheckoutForm from "../CheckoutForm/CheckoutForm"
-import CartIcons from "../CartIcons/CartIcons"
-import CheckoutInfo from "../CheckoutInfo/CheckoutInfo"
+import { useNavigate } from "react-router-dom"
+import { SubNavBar, Footer, NavBar } from "components"
+import codepath from "../../assets/codepath.svg"
+import { formatPrice } from "../../utils/format"
+import { calculateItemSubtotal, calculateTaxesAndFees, calculateTotal } from "../../utils/calculations"
 import "./ShoppingCart.css"
 
-export default function ShoppingCart(props) {
+export default function ShoppingCart({
+  user,
+  cart,
+  products,
+  getTotalItemsInCart, 
+  addToCart,
+  removeFromCart,
+  getQuantityOfItemInCart,
+  handleLogout,
+  handleOnCheckout,  
+}) {
+  const navigate = useNavigate()
+
+  const productMapping = products.reduce((acc, product) => {
+    acc[product.id] = product
+    return acc
+  }, {})
+
+  const cartMapping = Object.keys(cart).reduce((acc, id) => {
+    acc[id] = productMapping[id]
+    return acc
+  }, {})
+
+  const subTotal = Object.values(cartMapping).reduce((acc, product) => {
+    return acc + calculateItemSubtotal(product.price, getQuantityOfItemInCart(product))
+  }, 0)
+
+  const onCheckoutSubmit = async () => {
+    const order = await handleOnCheckout()
+    if (order) {
+      navigate("/orders")
+    }
+  }
+
+  const cartHasItems = Boolean(Object.keys(cartMapping).length)
+
   return (
     <div className="shopping-cart">
-        {props.isOpen ?
-          <div className="open">
-            <h3>
-                Shopping Cart <span className="button"><i className="material-icons md-48">add_shopping_cart</i></span>
-            </h3>            
-            {props.shoppingCart.products.length > 0 ? <CartTable products={props.products} shoppingCart={props.shoppingCart}/>: <div className="notification">No items added to cart yet. Start shopping now!</div>}
-            <CheckoutForm error={props.error} checkoutForm={props.checkoutForm} onCheckoutFormChange={props.onCheckoutFormChange} onSubmitCheckoutForm={props.onSubmitCheckoutForm}/>
-            <CheckoutInfo setError={props.setError} setIsOpen={props.setIsOpen} setReceiptLines={props.setReceiptLines} error={props.error} receiptLines={props.receiptLines}/>
-          </div> : 
-          <CartIcons setIsOpen={props.setIsOpen}/>
-        }
-        
+      <NavBar user={user} handleLogout={handleLogout}/>      
+      <div className="banner">
+        <div className="content">
+          <h2>Cart - ({getTotalItemsInCart()}) items</h2>
+        </div>
+      </div>
+
+      <div className="content">
+        <div className="cart-items">
+          <div className="items-list">
+            {!cartHasItems ? (
+              <div className="card">
+                <p>Nothing in your cart yet.</p>
+              </div>
+            ) : null}
+            {Object.values(cartMapping).map((product) => (
+              <CartItem
+                key={product.id}
+                product={product}
+                quantity={getQuantityOfItemInCart(product)}
+                addToCart={() => addToCart(product)}
+                removeFromCart={() => removeFromCart(product)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {cartHasItems ? (
+          <div className="receipt">
+            <div className="receipt-subtotal">
+              <span className="label">Subtotal</span>
+              <span>{formatPrice(subTotal)}</span>
+            </div>
+            <div className="receipt-taxes">
+              <span className="label">Taxes and Fees</span>
+              <span>{formatPrice(calculateTaxesAndFees(subTotal))}</span>
+            </div>
+            <div className="receipt-total">
+              <span className="label">Total</span>
+              <span>{formatPrice(calculateTotal(subTotal))}</span>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="checkout">
+          {user?.email ? (
+            <button onClick={onCheckoutSubmit}>Checkout</button>
+          ) : (
+            <button className="is-disabled" disabled>
+              Sign In To Checkout
+            </button>
+          )}
+        </div>
+      </div>
+      <Footer />
+    </div>
+  )
+}
+
+const CartItem = ({ product, quantity, addToCart, removeFromCart }) => {
+  return (
+    <div className="cart-item">
+      <div className="item-info">
+        <div className="item">
+          <img className="image" src={product.image || codepath} alt="product cover" />
+          <div className="name-and-price">
+            <p className="name">{product.name}</p>
+            <p className="price">{formatPrice(product.price)}</p>
+          </div>
+
+          <div className="actions">
+            <div className="buttons">
+              <button onClick={addToCart}>
+                <i className="material-icons">add</i>
+              </button>
+              <span>{quantity}</span>
+              <button onClick={removeFromCart}>
+                <i className="material-icons">remove</i>
+              </button>
+            </div>
+
+            <div className="trash">
+              <button onClick={removeFromCart}>
+                <i className="material-icons">delete</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="item-subtotals">
+        <div className="subtotals">
+          <span>{formatPrice(quantity * product.price)}</span>
+        </div>
+      </div>
     </div>
   )
 }
