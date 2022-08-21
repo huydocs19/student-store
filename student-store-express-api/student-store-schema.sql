@@ -30,3 +30,11 @@ CREATE TABLE order_details (
   discount    INTEGER,
   PRIMARY KEY (order_id, product_id)
 );
+
+CREATE TABLE ratings (
+  rating      INTEGER NOT NULL CHECK (rating > 0 AND rating <= 5),
+  product_id     INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  customer_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at  TIMESTAMP NOT NULL DEFAULT NOW(),  
+  PRIMARY KEY (product_id, customer_id)
+);

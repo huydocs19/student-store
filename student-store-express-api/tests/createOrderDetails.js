@@ -15,10 +15,9 @@ const createOrderDetails = async (orderIds, productIds) => {
         [orderId, productId, 0]
     )
   })
-  const results = await db.query(`SELECT order_id, product_id FROM order_details ORDER BY order_id ASC, product_id ASC`)
-
-  const ids = results.rows.map((row) => ({orderId: row.order_id, productId: row.product_id}))
-  return ids
+  const results = await db.query(`SELECT order_id AS "orderId", product_id AS "productId" FROM order_details ORDER BY order_id ASC, product_id ASC`)
+ 
+  return results.rows
 }
 
 module.exports = {

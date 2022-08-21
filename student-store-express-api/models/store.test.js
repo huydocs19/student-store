@@ -19,10 +19,11 @@ describe("Store", () => {
             const products = await Store.listProducts()
             expect(products.length).toEqual(16)
 
-            products.forEach((product) => {
+            products.forEach((product) => {                
                 expect(product).toEqual({
                     id: expect.any(Number),
                     name: expect.any(String),
+                    rating: expect.any(String),
                     category: expect.any(String),                    
                     image: expect.any(String),                    
                     description: expect.any(String),
@@ -38,16 +39,17 @@ describe("Store", () => {
         test("Can fetch product by id", async () => {
             const productId = testProductIds[0]
             const testProduct = {
-                "id": productId,
-                "name": "Rice Krispies",
-                "category": "food",
-                "image": "https://upload.wikimedia.org/wikipedia/commons/c/cd/RKTsquares.jpg",
-                "description": "Delicious corn-based rice grains melted together with marshmallows into a square-like shape.",
-                "price": "99"
+                id: productId,
+                name: "Rice Krispies",
+                category: "food",
+                rating: 4.50,
+                image: "https://upload.wikimedia.org/wikipedia/commons/c/cd/RKTsquares.jpg",
+                description: "Delicious corn-based rice grains melted together with marshmallows into a square-like shape.",
+                price: "99"
               }
-
-            const product = await Store.fetchProductById(productId)
-
+            
+            const product = await Store.fetchProductById(productId)            
+            product.rating = Math.round((parseFloat(product.rating) + Number.EPSILON) * 100) / 100
             expect(product).toEqual(testProduct)
             
         })

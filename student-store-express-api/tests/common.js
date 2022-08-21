@@ -2,11 +2,13 @@ const { createUsers, jloToken, lebronToken, adminToken } = require("./createUser
 const { createProducts } = require("./createProducts")
 const { createOrders } = require("./createOrders")
 const { createOrderDetails } = require("./createOrderDetails")
+const { createRatings } = require("./createRatings")
 const db = require("../db.js")
 
 const testProductIds = []
 const testOrderIds = []
 const testOrderDetailIds = []
+const testRatingIds = []
 const testTokens = { jloToken, lebronToken, adminToken }
 
 async function commonBeforeAll() {
@@ -34,6 +36,10 @@ async function commonBeforeAll() {
   
   for (let i = 0; i < orderDetailIds.length; i++) {    
     testOrderDetailIds.push(orderDetailIds[i])
+  }
+  const ratingIds = await createRatings(userIds, productIds)
+  for (let i = 0; i < ratingIds.length; i++) {    
+    testRatingIds.push(ratingIds[i])
   }
 }
 

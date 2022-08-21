@@ -1,5 +1,7 @@
 const express = require("express")
 const Store = require("../models/store")
+const Rating = require("../models/rating")
+const security = require("../middleware/security")
 const { NotFoundError } = require("../utils/errors")
 const router = express.Router()
 
@@ -24,6 +26,21 @@ router.get("/:productId", async (req, res, next) => {
       next(err)
     }
   })
+router.post(
+  "/:productId/ratings",
+  security.requireAuthenticatedUser,  
+  async (req, res, next) => {
+    try {
+      // create a new rating for a product
+      const { productId } = req.params
+      const { user } = res.locals
+      const rating = await Rating.createRatingForProduct({ rating: req.body.rating, user, productId })      
+      return res.status(201).json({ rating })
+    } catch (err) {
+      next(err)
+    }
+  }
+)
 
 
 module.exports = router

@@ -1,5 +1,4 @@
-const { NotFoundError, BadRequestError, UnauthorizedError } = require("../utils/errors")
-const User = require("./user")
+const {BadRequestError} = require("../utils/errors")
 const Order = require("./order")
 const {
   commonBeforeAll,
