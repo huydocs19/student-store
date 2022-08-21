@@ -1,14 +1,17 @@
+import {useState, useEffect} from "react"
 import { useNavigate } from "react-router-dom"
-import { SubNavBar, Footer, NavBar } from "components"
+import apiClient from "../../services/apiClient"
+import { Footer, NavBar } from "components"
 import codepath from "../../assets/codepath.svg"
 import { formatPrice } from "../../utils/format"
 import { calculateItemSubtotal, calculateTaxesAndFees, calculateTotal } from "../../utils/calculations"
+import {getCartFromToken } from "../../utils/cart"
 import "./ShoppingCart.css"
 
 export default function ShoppingCart({
-  user,
+  user, 
   cart,
-  products,
+  setCart,
   getTotalItemsInCart, 
   addToCart,
   removeFromCart,
@@ -16,22 +19,41 @@ export default function ShoppingCart({
   handleLogout,
   handleOnCheckout,  
 }) {
+  const [cartMapping, setCartMapping] = useState({}) 
+  const [isFetching, setIsFetching] = useState(false)
+  const [subTotal, setSubTotal] = useState(0)
   const navigate = useNavigate()
+  useEffect(() => {
+    const localCart = getCartFromToken()
+    if (localCart && Object.keys(localCart).length > 0) { 
+      setCart(localCart)
+    }
+  }, [setCart])
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsFetching(true)
 
-  const productMapping = products.reduce((acc, product) => {
-    acc[product.id] = product
-    return acc
-  }, {})
-
-  const cartMapping = Object.keys(cart).reduce((acc, id) => {
-    acc[id] = productMapping[id]
-    return acc
-  }, {})
-
-  const subTotal = Object.values(cartMapping).reduce((acc, product) => {
-    return acc + calculateItemSubtotal(product.price, getQuantityOfItemInCart(product))
-  }, 0)
-
+      const {data} = await apiClient.fetchProductList()  
+      if (data?.products) { 
+        const pMapping = data.products.reduce((acc, product) => {
+          acc[product.id] = product
+          return acc
+        }, {})        
+        const cMapping = Object.keys(cart).reduce((acc, id) => {
+          acc[id] = pMapping[id]
+          return acc
+        }, {})
+        const total = Object.values(cMapping).reduce((acc, product) => {    
+          return acc + calculateItemSubtotal(product.price, getQuantityOfItemInCart(product))
+        }, 0)
+        setCartMapping(cMapping)  
+        setSubTotal(total)       
+      } 
+      setIsFetching(false)
+    }    
+    fetchProducts()
+  }, [cart, getQuantityOfItemInCart])
+  
   const onCheckoutSubmit = async () => {
     const order = await handleOnCheckout()
     if (order) {
@@ -51,7 +73,11 @@ export default function ShoppingCart({
       </div>
 
       <div className="content">
-        <div className="cart-items">
+        <div className="cart-items"> 
+        {isFetching ? 
+          <div className="card">
+            <p>Loading...</p>
+          </div>:
           <div className="items-list">
             {!cartHasItems ? (
               <div className="card">
@@ -67,7 +93,8 @@ export default function ShoppingCart({
                 removeFromCart={() => removeFromCart(product)}
               />
             ))}
-          </div>
+          </div>    
+        }
         </div>
 
         {cartHasItems ? (

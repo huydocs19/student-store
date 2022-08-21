@@ -7,23 +7,28 @@ import {
   About,
   Contact,
   Footer,
-  NavBar,  
+  NavBar,
+  Sidebar,  
 } from "components"
 import "./Home.css"
 
 export default function Home({
   user,
   isFetching,
+  isOpen,
+  setIsOpen,
   products,
   activeCategory,
   setActiveCategory,
   handleOnSearchInputChange,
   searchInputValue,
+  cart,
   addToCart,
   removeFromCart,
   getQuantityOfItemInCart,
   handleLogout,  
   searchProduct,
+  handleOnCheckout,
 }) {
   const location = useLocation()
 
@@ -37,7 +42,15 @@ export default function Home({
   }, [location.hash])  
 
   return (
-    <div className="Home">      
+    <div className="Home">  
+      <Sidebar user={user} 
+      products={products} 
+      cart={cart}       
+      isOpen={isOpen} 
+      setIsOpen={setIsOpen}
+      getQuantityOfItemInCart={getQuantityOfItemInCart}
+      handleOnCheckout={handleOnCheckout}/>    
+     
       <NavBar user={user} handleLogout={handleLogout}/>
       <Hero />
       <SubNavBar        

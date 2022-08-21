@@ -25,25 +25,31 @@ export default function Orders({
   orders,
   setOrders,
   handleLogout, 
-}) {  
+}) {    
   const [isFetching, setIsFetching] = useState(false)
-  // const ordersMapping = groupOrderDetailsByOrderId(orders)
+  const [hasOrders, setHasOrders] = useState(false)  
   useEffect(() => {
     const fetchOrders = async () => {
-      setIsFetching(true)
-
+      setIsFetching(true)      
       const {data} = await apiClient.fetchOrderList()     
       
-      if (data?.orders) { 
-        const ordersMapping = groupOrderDetailsByOrderId(data.orders)       
+      if (data?.orders && data.orders.length > 1) { 
+        const ordersMapping = groupOrderDetailsByOrderId(data.orders) 
+        setHasOrders(Boolean(Object.keys(orders)?.length))
         setOrders(ordersMapping)    
       } 
       setIsFetching(false)
     }
-
-    fetchOrders()
-  }, [])
-  const hasOrders = Boolean(Object.keys(orders)?.length)
+    const token = localStorage.getItem(apiClient.getTokenKey())    
+    if (token) {
+      apiClient.setToken(token)
+      if (!orders || orders.length < 1) {
+        fetchOrders()
+      }      
+    }
+    
+  }, [orders, setOrders])
+  
 
   return (
     <div className="orders">
@@ -55,6 +61,10 @@ export default function Orders({
       </div>
 
       <div className="content">
+      {isFetching ? 
+          <div className="card">
+            <p>Loading...</p>
+          </div>:
         <div className="order-list">
           <div className="order-list-header">
             <span>Order</span>
@@ -74,6 +84,7 @@ export default function Orders({
             </div>
           ) : null}
         </div>
+      }
       </div>
 
       <Footer />

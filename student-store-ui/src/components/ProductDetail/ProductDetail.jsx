@@ -43,7 +43,9 @@ export default function ProductDetail({
         searchProduct={searchProduct}
       />
       {isFetching ? 
-        <h1 className="loading">Loading...</h1>:
+          <div className="card">
+            <p>Loading...</p>
+          </div>:
         product ?
         <ProductView 
           product={product} 

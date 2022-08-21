@@ -15,7 +15,7 @@ import {
   ProductDetail
 } from "components"
 
-import { removeFromCart, addToCart, getQuantityOfItemInCart, getTotalItemsInCart } from "../../utils/cart"
+import { removeFromCart, addToCart, getQuantityOfItemInCart, getTotalItemsInCart, removeCartToken, getCartFromToken } from "../../utils/cart"
 import "./App.css"
 
 export default function App() {
@@ -28,6 +28,7 @@ export default function App() {
   const [orders, setOrders] = useState([])
   const [isCheckingOut, setIsCheckingOut] = useState(false)
   const [error, setError] = useState(null)  
+  const [isOpen, setIsOpen] = useState(false)
 
   const handleOnRemoveFromCart = (item) => setCart(removeFromCart(cart, item))
   const handleOnAddToCart = (item) => setCart(addToCart(cart, item))
@@ -48,6 +49,7 @@ export default function App() {
     if (data?.order) {      
       setIsCheckingOut(false)
       setCart({})
+      removeCartToken()
       return data.order    
     } else {
       setError("Error checking out.")
@@ -100,8 +102,7 @@ export default function App() {
         setError("Error fetching products.")
       }
       setIsFetching(false)
-    }
-
+    }    
     fetchProducts()
   }, [activeCategory])
   useEffect(() => {
@@ -118,7 +119,7 @@ export default function App() {
         setError("Error fetching user.")
       }      
       setIsFetching(false)
-    }
+    }    
 
     const token = localStorage.getItem(apiClient.getTokenKey())    
     if (token) {
@@ -127,6 +128,13 @@ export default function App() {
     }
     
   }, [])
+  useEffect(() => {
+    const localCart = getCartFromToken()
+    if (localCart && Object.keys(localCart).length > 0) {      
+      setCart(localCart)
+    }
+  }, [])
+  
   const handleLogout = async () => {    
     await apiClient.logOutUser()
     setUser(null)
@@ -137,27 +145,33 @@ export default function App() {
   return (
     <div className="app">
       <BrowserRouter>
-        <Routes>
+        <Routes> 
           <Route
             path="/"
             element={
               <Home
                 user={user}
                 error={error}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                isCheckingOut={isCheckingOut}
                 products={products}
                 isFetching={isFetching}
                 activeCategory={activeCategory}
                 setActiveCategory={setActiveCategory}
                 searchInputValue={searchInputValue}
                 handleOnSearchInputChange={handleOnSearchInputChange}
+                cart={cart}
                 addToCart={handleOnAddToCart}
                 removeFromCart={handleOnRemoveFromCart}
                 getQuantityOfItemInCart={handleGetItemQuantity}
                 handleLogout={handleLogout}  
-                searchProduct={handleOnProductSearch}              
+                searchProduct={handleOnProductSearch}  
+                handleOnCheckout={handleOnCheckout}            
               />
             }
-          />             
+          />          
+          
           <Route path="/store/:productId" element={  
             <ProductDetail 
               user={user}               
@@ -178,43 +192,27 @@ export default function App() {
             path="/orders"
             element={
               <Orders
-                user={user}
-                error={error}                
-                setUser={setUser}
-                products={products}
+                user={user}                
                 orders={orders}
-                setOrders = {setOrders}
-                isFetching={isFetching}
-                activeCategory={activeCategory}
-                setActiveCategory={setActiveCategory}
-                searchInputValue={searchInputValue}
-                handleOnSearchInputChange={handleOnSearchInputChange}
-                handleLogout={handleLogout}
-                searchProduct={handleOnProductSearch}
+                setOrders = {setOrders}                
+                handleLogout={handleLogout}                
               />
             }
-          />
+          />          
           <Route
             path="/shopping-cart"
             element={
               <ShoppingCart
                 user={user}
                 cart={cart}
-                error={error}
-                setUser={setUser}
-                products={products}
-                activeCategory={activeCategory}
-                setActiveCategory={setActiveCategory}
-                searchInputValue={searchInputValue}
-                handleOnSearchInputChange={handleOnSearchInputChange}
+                setCart={setCart}   
                 addToCart={handleOnAddToCart}
                 removeFromCart={handleOnRemoveFromCart}
-                getQuantityOfItemInCart={handleGetItemQuantity}
-                getTotalItemsInCart={handleGetTotalCartItems}
                 isCheckingOut={isCheckingOut}
+                getQuantityOfItemInCart={handleGetItemQuantity}
+                getTotalItemsInCart={handleGetTotalCartItems}                
                 handleOnCheckout={handleOnCheckout}
-                handleLogout={handleLogout}
-                searchProduct={handleOnProductSearch}
+                handleLogout={handleLogout}                
               />
             }
           />
@@ -222,9 +220,7 @@ export default function App() {
             path="*"
             element={
               <NotFound
-                user={user}
-                error={error}
-                products={products}
+                user={user}                
                 activeCategory={activeCategory}
                 setActiveCategory={setActiveCategory}
                 searchInputValue={searchInputValue}

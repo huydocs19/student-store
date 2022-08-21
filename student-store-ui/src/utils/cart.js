@@ -1,3 +1,13 @@
+export const cart_key = "cart_key"
+export const setCartToken = (cart) => {    
+    localStorage.setItem(cart_key, JSON.stringify(cart))  
+}
+export const getCartFromToken = () => {
+    return JSON.parse(localStorage.getItem(cart_key))  
+}
+export const removeCartToken = () => {
+    localStorage.removeItem(cart_key)
+}
 /**
  * Function that removes an item from the shopping cart
  *
@@ -13,6 +23,7 @@
     if (newCart[item.id] <= 0) {
       delete newCart[item.id]
     }
+    setCartToken(newCart)    
   
     return newCart
   }
@@ -23,18 +34,21 @@
    * @param {Item} item - the item to add
    * @return {Cart}
    */
-  export const addToCart = (cart, item) => {
+  export const addToCart = (cart, item) => {    
     if (cart.hasOwnProperty(item.id)) {
-      return {
+      const newCart = {
         ...cart,
         [item.id]: cart[item.id] + 1,
       }
+      setCartToken(newCart)
+      return newCart
     }
-  
-    return {
+    const newCart = {
       ...cart,
       [item.id]: 1,
     }
+    setCartToken(newCart)
+    return newCart
   }
   
   /**
