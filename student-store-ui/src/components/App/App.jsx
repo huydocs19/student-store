@@ -15,7 +15,7 @@ import {
   ProductDetail
 } from "components"
 
-import { removeFromCart, addToCart, getQuantityOfItemInCart, getTotalItemsInCart, removeCartToken, getCartFromToken } from "../../utils/cart"
+import { deleteFromCart, removeFromCart, addToCart, getQuantityOfItemInCart, getTotalItemsInCart, removeCartToken, getCartFromToken } from "../../utils/cart"
 import "./App.css"
 
 export default function App() {
@@ -32,6 +32,7 @@ export default function App() {
 
   const handleOnRemoveFromCart = (item) => setCart(removeFromCart(cart, item))
   const handleOnAddToCart = (item) => setCart(addToCart(cart, item))
+  const handleOnDeleteFromCart = (item) => setCart(deleteFromCart(cart, item))
   const handleGetItemQuantity = (item) => getQuantityOfItemInCart(cart, item)
   const handleGetTotalCartItems = () => getTotalItemsInCart(cart)
 
@@ -49,6 +50,7 @@ export default function App() {
     if (data?.order) {     
       setOrders((o) => [...data.order, ...o]) 
       setIsCheckingOut(false)
+      setIsOpen(false)
       setCart({})
       removeCartToken()
       return data.order    
@@ -158,7 +160,7 @@ export default function App() {
   }, [user])
   useEffect(() => {
     const localCart = getCartFromToken()
-    if (localCart && Object.keys(localCart).length > 0) {      
+    if (localCart && Object.keys(localCart).length > 0) { 
       setCart(localCart)
     }
   }, [])
@@ -192,7 +194,7 @@ export default function App() {
                 handleOnSearchInputChange={handleOnSearchInputChange}
                 cart={cart}
                 addToCart={handleOnAddToCart}
-                removeFromCart={handleOnRemoveFromCart}
+                removeFromCart={handleOnRemoveFromCart}                
                 getQuantityOfItemInCart={handleGetItemQuantity}
                 handleLogout={handleLogout}  
                 searchProduct={handleOnProductSearch}  
@@ -229,10 +231,10 @@ export default function App() {
             element={
               <ShoppingCart
                 user={user}
-                cart={cart}
-                setCart={setCart}   
+                cart={cart}                  
                 addToCart={handleOnAddToCart}
                 removeFromCart={handleOnRemoveFromCart}
+                deleteFromCart={handleOnDeleteFromCart}
                 isCheckingOut={isCheckingOut}
                 getQuantityOfItemInCart={handleGetItemQuantity}
                 getTotalItemsInCart={handleGetTotalCartItems}                

@@ -5,16 +5,15 @@ import { Footer, NavBar } from "components"
 import codepath from "../../assets/codepath.svg"
 import { formatPrice } from "../../utils/format"
 import { calculateItemSubtotal, calculateTaxesAndFees, calculateTotal } from "../../utils/calculations"
-import {getCartFromToken } from "../../utils/cart"
 import "./ShoppingCart.css"
 
 export default function ShoppingCart({
   user, 
-  cart,
-  setCart,
+  cart,  
   getTotalItemsInCart, 
   addToCart,
   removeFromCart,
+  deleteFromCart,
   getQuantityOfItemInCart,
   handleLogout,
   handleOnCheckout,  
@@ -22,13 +21,7 @@ export default function ShoppingCart({
   const [cartMapping, setCartMapping] = useState({}) 
   const [isFetching, setIsFetching] = useState(false)
   const [subTotal, setSubTotal] = useState(0)
-  const navigate = useNavigate()
-  useEffect(() => {
-    const localCart = getCartFromToken()
-    if (localCart && Object.keys(localCart).length > 0) { 
-      setCart(localCart)
-    }
-  }, [setCart])
+  const navigate = useNavigate() 
   useEffect(() => {
     const fetchProducts = async () => {
       setIsFetching(true)
@@ -91,6 +84,7 @@ export default function ShoppingCart({
                 quantity={getQuantityOfItemInCart(product)}
                 addToCart={() => addToCart(product)}
                 removeFromCart={() => removeFromCart(product)}
+                deleteFromCart={() => deleteFromCart(product)}
               />
             ))}
           </div>    
@@ -129,7 +123,7 @@ export default function ShoppingCart({
   )
 }
 
-const CartItem = ({ product, quantity, addToCart, removeFromCart }) => {
+const CartItem = ({ product, quantity, addToCart, removeFromCart, deleteFromCart }) => {
   return (
     <div className="cart-item">
       <div className="item-info">
@@ -152,7 +146,7 @@ const CartItem = ({ product, quantity, addToCart, removeFromCart }) => {
             </div>
 
             <div className="trash">
-              <button onClick={removeFromCart}>
+              <button onClick={deleteFromCart}>
                 <i className="material-icons">delete</i>
               </button>
             </div>

@@ -9,23 +9,45 @@ export const removeCartToken = () => {
     localStorage.removeItem(cart_key)
 }
 /**
+ * Function that deletes an item from the shopping cart
+ *
+ * @param {Item} item - the item to remove
+ * @return {Cart}
+ */
+ export const deleteFromCart = (cart, item) => {
+  if (cart.hasOwnProperty(item.id)) {
+    const newCart = {...cart}
+    delete newCart[item.id]
+    setCartToken(newCart) 
+    return newCart
+  } else {
+    return {...cart}
+  }
+  
+}
+/**
  * Function that removes an item from the shopping cart
  *
  * @param {Item} item - the item to remove
  * @return {Cart}
  */
  export const removeFromCart = (cart, item) => {
-    const newCart = {
-      ...cart,
-      [item.id]: cart[item.id] - 1,
+    if (cart.hasOwnProperty(item.id)) {
+      const newCart = {
+        ...cart,
+        [item.id]: cart[item.id] - 1,
+      }
+    
+      if (newCart[item.id] <= 0) {
+        delete newCart[item.id]
+      }
+      setCartToken(newCart)    
+    
+      return newCart
+    } else {
+      return {...cart}
     }
-  
-    if (newCart[item.id] <= 0) {
-      delete newCart[item.id]
-    }
-    setCartToken(newCart)    
-  
-    return newCart
+    
   }
   
   /**
@@ -34,19 +56,19 @@ export const removeCartToken = () => {
    * @param {Item} item - the item to add
    * @return {Cart}
    */
-  export const addToCart = (cart, item) => {    
+  export const addToCart = (cart, item) => {      
     if (cart.hasOwnProperty(item.id)) {
       const newCart = {
         ...cart,
         [item.id]: cart[item.id] + 1,
       }
-      setCartToken(newCart)
+      setCartToken(newCart)      
       return newCart
     }
     const newCart = {
       ...cart,
       [item.id]: 1,
-    }
+    }    
     setCartToken(newCart)
     return newCart
   }

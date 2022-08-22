@@ -26,20 +26,20 @@ export default function ProductCard({
 
     const { data, error } = await apiClient.fetchProductById(product.id)
     if (error) {
-      setError(error)
+      setError(error)      
     }
-    if (data?.product) {
-      setProduct(data.product)      
+    if (data?.product?.rating) {
+      const productUpdate = {rating: data.product.rating}
+      setProduct(data.product)
+      updateProduct({productId: product.id, productUpdate})      
     }
     setIsFetching(false)
   }
   const handleOnSaveRating = async () => {
-    setIsSavingRating(true)  
-    const productUpdate = {rating}  
+    setIsSavingRating(true)      
     const { data, error } = await apiClient.createRatingForProduct({ productId: product.id, rating })
     if (data?.rating) {
-      await fetchProduct(product.id)
-      updateProduct({productId: product.id, productUpdate})
+      await fetchProduct(product.id)      
     }
     if (error) {
       setError(error)
@@ -91,9 +91,15 @@ export default function ProductCard({
             <div className="rate-product">
                 <p>Rate this product</p>
                 <StarsInput value={rating} setValue={setRating} max={5} />
-                <button className="btn" onClick={handleOnSaveRating} disabled={!userIsLoggedIn}>
-                  {isSavingRating ? "Loading..." : "Save Rating"}
-                </button>
+                {userIsLoggedIn ? (
+                  <button className="btn" onClick={handleOnSaveRating} disabled={!userIsLoggedIn}>
+                    {isSavingRating ? "Loading..." : "Save Rating"}
+                  </button>
+                ) : (
+                  <button className="btn is-disabled" disabled>
+                    Sign In To Save Rating
+                  </button>
+                )}                
               </div>:
             null
           }

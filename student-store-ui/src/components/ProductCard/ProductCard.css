@@ -61,6 +61,11 @@
     border: none;
     cursor: pointer;
 }
+.product-card .actions .rate-product .btn.is-disabled {
+    color: white;
+    background: var(--star-color-empty);
+    cursor: not-allowed;
+  }
 .product-card .product-quantity {
     width: 80px;
     display: flex;
