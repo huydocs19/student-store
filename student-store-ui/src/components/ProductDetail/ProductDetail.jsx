@@ -1,43 +1,56 @@
-import * as React from "react"
-import axios from "axios"
+import {useState, useEffect} from "react"
+import apiClient from "../../services/apiClient"
 import { useParams } from "react-router-dom"
-import NotFound from "../NotFound/NotFound"
-import ProductView from "../ProductView/ProductView"
+import {NavBar, NotFound, ProductView} from "components"
 import "./ProductDetail.css"
 
-export default function ProductDetail(props) {
-  const [product, setProduct] = React.useState(null)
-  const [isLoading, setIsLoading] = React.useState(false)  
-  let {productId} = useParams()
-  const getProductQuantity = (productId) => {
-    const item = props.shoppingCart?.products?.find((item) => item.itemId == productId)    
-    if (item) {      
-      return item.quantity
-    }   
-    return 0
-  }
-  React.useEffect(() => {
+export default function ProductDetail({
+  user,
+  updateProduct,   
+  addToCart,
+  removeFromCart,
+  getQuantityOfItemInCart,
+  handleLogout,  
+}) {
+  const [product, setProduct] = useState(null)
+  const [isFetching, setIsFetching] = useState(false)
+  const [error, setError] = useState(null)   
+  let {productId} = useParams() 
+  
+  useEffect(() => {
     const fetchProduct = async () => {
-      setIsLoading(true) 
-      axios.get(`http://localhost:3001/store/${productId}`)
-      .then((response) => {             
-        if (response?.data?.product) {
-          setProduct(response.data.product)
-        } 
-        setIsLoading(false) 
-      })
-      .catch(function (error) {
-        setIsLoading(false) 
-      });
+      setIsFetching(true)      
+      const {data, error} = await apiClient.fetchProductById(productId) 
+      if (error) {
+        setError(error)
+      }
+      if (data?.product) {       
+        setProduct(data.product)                      
+      } else {
+        setError("Error fetching the product.")
+      }
+      setIsFetching(false)      
     } 
     fetchProduct()
-  }, []);
+  }, [productId]);
   return (
     <div className="product-detail">
-      {isLoading ? 
-        <h1 className="loading">Loading...</h1>:
+      <NavBar user={user} handleLogout={handleLogout}/>       
+      {isFetching ? 
+          <div className="card">
+            <p>Loading...</p>
+          </div>:
+        error ? <span className="error">Error: {error}</span>:
         product ?
-        <ProductView product={product} productId={product.id} quantity={getProductQuantity(product.id)} addItemToCart={props.addItemToCart} removeItemFromCart={props.removeItemFromCart}/>:
+        <ProductView 
+          user={user}
+          updateProduct={updateProduct}
+          product={product} 
+          setProduct={setProduct}
+          quantity={getQuantityOfItemInCart(product)} 
+          addToCart={addToCart} 
+          removeFromCart={removeFromCart}
+        />:
         <NotFound />
       }
     </div>

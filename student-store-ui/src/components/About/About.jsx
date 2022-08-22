@@ -1,3 +1,4 @@
+import giant_codepath from "../../assets/giant_codepath.svg"
 import * as React from "react"
 import "./About.css"
 
@@ -12,7 +13,7 @@ export default function About() {
               <p>We've searched far and wide for items that perk the interests of even the most eccentric students and decided to offer them all here in one place.</p>
               <p>All proceeds go towards bringing high quality CS education to college students around the country.</p>
             </div>
-              <div className="media"><img src="/assets/giant_codepath.svg" alt="codepath large"/>
+              <div className="media"><img src={giant_codepath} alt="codepath large"/>
               </div>
           </div>
         </div>

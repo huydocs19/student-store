@@ -1,15 +1,24 @@
-import * as React from "react"
-import ShoppingCart from "../ShoppingCart/ShoppingCart"
+import { SidebarShoppingCart } from "components"
 import "./Sidebar.css"
 
-export default function Sidebar(props) {
+export default function Sidebar({
+  user,
+  errors,
+  products,
+  cart,     
+  isOpen, 
+  isCheckingOut,
+  setIsOpen,
+  getQuantityOfItemInCart,
+  handleOnCheckout,
+}) {
   return (
-    <section className={`sidebar ${props.isOpen ? "open": "closed"}`}>
+    <section className={`sidebar ${isOpen ? "open": "closed"}`}>
       <div className="wrapper">
-        <button className={`toggle-button button ${props.isOpen ? "open": "closed"}`} onClick={props.onToggle}>
+        <button className={`toggle-button button ${isOpen ? "open": "closed"}`} onClick={() => setIsOpen(!isOpen)}>
           <i className="material-icons md-48">arrow_forward</i>
         </button>
-        <ShoppingCart setError={props.setError} setIsOpen={props.setIsOpen} setReceiptLines={props.setReceiptLines} error={props.error} receiptLines={props.receiptLines} products={props.products} isOpen={props.isOpen} checkoutForm={props.checkoutForm} shoppingCart={props.shoppingCart} onCheckoutFormChange={props.onCheckoutFormChange} onSubmitCheckoutForm={props.onSubmitCheckoutForm}/>
+        <SidebarShoppingCart user={user} isCheckingOut={isCheckingOut} errors={errors} products={products} isOpen={isOpen} setIsOpen={setIsOpen} cart={cart} getQuantityOfItemInCart={getQuantityOfItemInCart} handleOnCheckout={handleOnCheckout}/>
       </div>
     </section>
   )

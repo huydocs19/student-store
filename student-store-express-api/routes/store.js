@@ -1,5 +1,7 @@
 const express = require("express")
 const Store = require("../models/store")
+const Rating = require("../models/rating")
+const security = require("../middleware/security")
 const { NotFoundError } = require("../utils/errors")
 const router = express.Router()
 
@@ -12,41 +14,11 @@ router.get("/", async (req, res, next) => {
     }
 })
 
-router.post("/", async (req, res, next) => {
-    try {
-        const order = req.body        
-        const newPurchase = await Store.createPurchaseOrder(order)        
-        res.status(201).json({ purchase: newPurchase })
-    } catch (err) { 
-        next(err)
-    }
-})
-router.get("/orders", async (req, res, next) => {
-  try {
-    const purchases = await Store.listPurchases()    
-    res.status(200).json({ purchases })
-  } catch (err) {     
-    next(err)
-  }
-})
-router.get("/orders/:orderId", async (req, res, next) => {
-  try {
-    const orderId = req.params.orderId
-    const order = await Store.fetchPurchaseById(orderId)
-    if (!order) {
-      throw new NotFoundError("Order not found")
-    }
-    res.status(200).json({ order })
-  } catch (err) {
-    next(err)
-  }
-})
-
 router.get("/:productId", async (req, res, next) => {
     try {
       const productId = req.params.productId
       const product = await Store.fetchProductById(productId)
-      if (!product) {
+      if (!product || product.length < 1) {
         throw new NotFoundError("Product not found")
       }
       res.status(200).json({ product })
@@ -54,6 +26,21 @@ router.get("/:productId", async (req, res, next) => {
       next(err)
     }
   })
+router.post(
+  "/:productId/ratings",
+  security.requireAuthenticatedUser,  
+  async (req, res, next) => {
+    try {
+      // create a new rating for a product
+      const { productId } = req.params
+      const { user } = res.locals
+      const rating = await Rating.createRatingForProduct({ rating: req.body.rating, user, productId })      
+      return res.status(201).json({ rating })
+    } catch (err) {
+      next(err)
+    }
+  }
+)
 
 
 module.exports = router

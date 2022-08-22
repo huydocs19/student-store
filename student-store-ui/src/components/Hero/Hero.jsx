@@ -1,4 +1,4 @@
-import * as React from "react"
+import student_store_icon from "../../assets/student_store_icon.svg"
 import "./Hero.css"
 
 export default function Hero() {
@@ -11,7 +11,7 @@ export default function Hero() {
                 <p>We have all kinds of goodies. Click on any of the items to start filling up your shopping cart. Checkout whenever you're ready.</p>
             </div>
             <div className="media">
-                <img src="/assets/student_store_icon.svg" alt="hero" className="hero-img"/>
+                <img src={student_store_icon} alt="hero" className="hero-img"/>
             </div>
         </div>
     </div>

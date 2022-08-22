@@ -1,203 +1,255 @@
-import * as React from "react"
-import axios from "axios"
+import {useState, useEffect} from "react"
+import apiClient from "../../services/apiClient"
 import {
   BrowserRouter,
   Routes,
-  Route,
-  Link
+  Route
 } from 'react-router-dom'
-import Navbar from "../Navbar/Navbar"
-import Sidebar from "../Sidebar/Sidebar"
-import Home from "../Home/Home"
-import ProductDetail from "../ProductDetail/ProductDetail"
-import NotFound from "../NotFound/NotFound"
-import Hero from "../Hero/Hero"
-import SubNavBar from "../SubNavBar/SubNavBar"
-import Orders from "../Orders/Orders"
+import {
+  Home,
+  Register,
+  Login,
+  Orders,
+  NotFound,
+  ShoppingCart,
+  ProductDetail
+} from "components"
+
+import { deleteFromCart, removeFromCart, addToCart, getQuantityOfItemInCart, getTotalItemsInCart, removeCartToken, getCartFromToken } from "../../utils/cart"
 import "./App.css"
-import OrderDetail from "../OrderDetail/OrderDetail"
 
-const baseURL = "http://localhost:3001/store";
 export default function App() {
-  const [products, setProducts] = React.useState([])
-  const [allProducts, setAllProducts] = React.useState([])
-  const [isFetching, setIsFetching] = React.useState(false)
-  const [error, setError] = React.useState({type: "", message:""})
-  const [isOpen, setIsOpen] = React.useState(false)
-  const [shoppingCart, setShoppingCart] = React.useState({totalPrice: 0, products: []})
-  const [checkoutForm, setCheckoutForm] = React.useState({name: "", email: ""})
-  const [receiptLines, setReceiptLines] = React.useState([])
-  const [searchTerm, setSearchTerm] = React.useState("")  
-  React.useEffect(() => {
-    const fetchProducts = async () => {
-      setIsFetching(true) 
-      axios.get(baseURL)
-      .then((response) => {               
-          if (response?.data?.products?.length > 0) {
-            setProducts(response.data.products)
-            setAllProducts(response.data.products) 
-            setError({type: "", message:""})        
-          } else {
-            setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
-          }
-          setIsFetching(false)         
-        })
-        .catch(function (error) {
-          setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
-          setIsFetching(false)
-        });
-    }
-    fetchProducts()
-  }, []);
+  const [activeCategory, setActiveCategory] = useState("All Categories")
+  const [searchInputValue, setSearchInputValue] = useState("")
+  const [user, setUser] = useState({})
+  const [products, setProducts] = useState([])
+  const [orders, setOrders] = useState([])
+  const [cart, setCart] = useState({})
+  const [isFetching, setIsFetching] = useState(false)
+  const [isCheckingOut, setIsCheckingOut] = useState(false)
+  const [errors, setErrors] = useState({}) 
+  const [isOpen, setIsOpen] = useState(false)
 
-  const handleOnToggle = () => {
-    setIsOpen(!isOpen)
+  const handleOnRemoveFromCart = (item) => setCart(removeFromCart(cart, item))
+  const handleOnAddToCart = (item) => setCart(addToCart(cart, item))
+  const handleOnDeleteFromCart = (item) => setCart(deleteFromCart(cart, item))
+  const handleGetItemQuantity = (item) => getQuantityOfItemInCart(cart, item)
+  const handleGetTotalCartItems = () => getTotalItemsInCart(cart)
+
+  const handleOnSearchInputChange = (event) => {
+    setSearchInputValue(event.target.value)
   }
-  const handleAddItemToCart = (productId) => {    
-    const product = products.find(element => element.id == productId)     
-    if (product) {
-      const item = shoppingCart.products?.find(element => element.itemId == productId)
-      const newTotalPrice = shoppingCart.totalPrice + product.price  
-      if (item) {      
-        const updatedProducts = shoppingCart.products?.map(element => {          
-          if (element.itemId == productId) {
-            return {...element, quantity: element.quantity + 1}
-          }
-          return element
-        })        
-        setShoppingCart({totalPrice: newTotalPrice, products: updatedProducts})     
-        
-      } else {        
-        const newItem = {
-          itemId: productId,          
-          quantity: 1
-        }
-        const newProducts = [...shoppingCart.products, newItem]
-        setShoppingCart({totalPrice: newTotalPrice, products: newProducts})        
-      }
-     
-    }
-  }
-  const handleRemoveItemFromCart = (productId) => {
-    const product = products.find(element => element.id == productId)
-    if (product) {
-      const item = shoppingCart.products?.find(element=> element.itemId == productId)      
-      if (item) {
-        const newTotalPrice = shoppingCart.totalPrice - product.price      
-        let updatedProducts
-        if (item.quantity <= 1) {
-          updatedProducts = shoppingCart.products?.filter(element => element.itemId != productId)
-        } else {
-          updatedProducts = shoppingCart.products?.map(element => {          
-            if (element.itemId == productId) {
-              return {...element, quantity: element.quantity - 1}
-            }
-            return element
-          })        
-        }
-        
-        setShoppingCart({totalPrice: newTotalPrice, products: updatedProducts})     
-        
-      }
-    }
-  }
-  const handleOnCheckoutFormChange = (name, value) => {
-    setCheckoutForm({...checkoutForm, [name]: value})
-  }
-  const handleOnSubmitCheckoutForm = (event) => {    
-    if (!shoppingCart.products || shoppingCart.products.length < 1) {      
-      setError({type: "NO_CART_ERROR", message:"No cart or items in cart found to checkout."})
-    } else if (!checkoutForm.name || !checkoutForm.email) {
-      
-      setError({type: "NO_USER_INFO_ERROR", message:"User info must include an email and name."})
-    } else {
-      axios.post(baseURL, {
-        user: {
-          name: checkoutForm.name,
-          email: checkoutForm.email
-        },
-        shoppingCart: shoppingCart.products
-      }).then((response) => {        
-        setShoppingCart({totalPrice: 0, products: []})
-        setCheckoutForm({name: "", email: ""})
-        if (error.type == "NO_CART_ERROR" || error.type == "NO_USER_INFO_ERROR") {
-          setError({type: "", message:""})
-        } 
-        if (response?.data?.purchase?.receipt?.lines) {
-          setReceiptLines(curr => response.data.purchase.receipt.lines)
-          if (error.type == "NO_RECEIPT_ERROR") {
-            setError({type: "", message:""})
-          }       
-        } else {
-          setError({type: "NO_RECEIPT_ERROR", message:"No Receipt Available"})
-        }
-      }).catch(function (error) {
-        setError({type: "FORM_SUBMIT_ERROR", message:"Cannot Submit Your Order"});
-      });
-    }
-    
-    
-  }
-  const handleCategoryChange = (category) => {
-    if (category == "all") {      
-      setProducts(allProducts)
-      if (allProducts.length < 1) {
-        setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
-      } else if (error.type == "NO_PRODUCTS_ERROR") {
-        setError({type: "", message:""})
-      }
-    } else {
-      const updatedProducts = allProducts.filter(element => element.category == category)
-      if (updatedProducts.length < 1) {
-        setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
-      } else if (error.type == "NO_PRODUCTS_ERROR") {
-        setError({type: "", message:""})
-      }
-      setProducts(updatedProducts)
+
+  const handleOnCheckout = async () => {
+    setIsCheckingOut(true)
+
+    const {data, error} = await apiClient.createOrder({ order: cart })
+    if (error) {
+      setErrors((e) => ({ ...e, checkout: error }))
     }    
-  }
-  const handleProductSearch = () => {
-    const updatedProducts = allProducts.filter(element => element.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    if (updatedProducts.length < 1) {
-      setError({type: "NO_PRODUCTS_ERROR", message:"No Products Available"})
-    } else if (error.type == "NO_PRODUCTS_ERROR") {
-      setError({type: "", message:""})
+    if (data?.order) {     
+      setOrders((o) => [...data.order, ...o]) 
+      setIsCheckingOut(false)
+      setIsOpen(false)
+      setCart({})
+      removeCartToken()
+      return data.order    
+    } else {
+      setErrors((e) => ({ ...e, checkout: "Error checking out."}))
     }
-    setProducts(updatedProducts)
-    setSearchTerm("")
+    setIsCheckingOut(false)    
   }
-  const handleOnSearchTermChange = (text) => {
-    setSearchTerm(text)
+  const handleOnProductSearch = () => { 
+    const fetchProductsBySearchInputValue = async () => {
+      setIsFetching(true)
+
+      const {data, error} = await apiClient.fetchProductList()      
+      if (error) {
+        setErrors((e) => ({ ...e, productSearch: error }))
+      }
+      if (data?.products) {             
+        const filteredProducts = data.products.filter(product => product.name.toLowerCase().includes(searchInputValue.toLowerCase())) 
+        setProducts(filteredProducts)
+        setActiveCategory("")    
+      } else {
+        setErrors((e) => ({ ...e, productSearch: "Error fetching products." }))
+      }
+      setIsFetching(false)
+      setSearchInputValue("")
+    }
+    fetchProductsBySearchInputValue()    
   }
+  const updateProduct = ({ productId, productUpdate }) => {
+    setProducts((oldProducts) => {
+      return oldProducts.map((product) => {
+        if (product.id === Number(productId)) {
+          return { ...product, ...productUpdate }
+        }
+
+        return product
+      })
+    })
+  }
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsFetching(true)
+
+      const {data, error} = await apiClient.fetchProductList()      
+      if (error) {
+        setErrors((e) => ({ ...e, products: error }))
+      }
+      if (data?.products) {
+        const filteredProducts = data.products.filter(product => {
+          if (activeCategory === "All Categories") { 
+            return true
+          } 
+          return product.category === activeCategory.toLowerCase()   
+        })        
+        setProducts(filteredProducts)    
+      } else {
+        setErrors((e) => ({ ...e, products: "Error fetching products." }))
+      }
+      setIsFetching(false)
+    }   
+    if (activeCategory) {
+      fetchProducts()
+    }     
+  }, [activeCategory])
+  useEffect(() => {
+    const fetchAuthedUser = async () => {
+      setIsFetching(true)
+      
+      const {data, error} = await apiClient.fetchUserFromToken()      
+      if (error) {
+        setErrors((e) => ({ ...e, user: error }))
+      }
+      if (data?.user) {
+        setUser(data.user)        
+      } else {
+        setErrors((e) => ({ ...e, user: "Error fetching user." }))
+      }      
+      setIsFetching(false)
+    }    
+
+    const token = localStorage.getItem(apiClient.getTokenKey())    
+    if (token) {
+      apiClient.setToken(token)
+      fetchAuthedUser()
+    }
+    
+  }, [])
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setIsFetching(true)      
+      const {data, error} = await apiClient.fetchOrderList()     
+      if (error) {
+        setErrors((e) => ({ ...e, orders: error }))
+      }
+      if (data?.orders) {         
+        setOrders(data.orders)    
+      } else {
+        setErrors((e) => ({ ...e, orders: "Error fetching orders." }))
+      }
+      setIsFetching(false)
+    }       
+    if (user?.username) { 
+      fetchOrders()
+    }
+    
+  }, [user])
+  useEffect(() => {
+    const localCart = getCartFromToken()
+    if (localCart && Object.keys(localCart).length > 0) { 
+      setCart(localCart)
+    }
+  }, [])
   
+  const handleLogout = async () => {    
+    await apiClient.logOutUser()
+    setUser(null)
+    setOrders([])    
+    setErrors({})
+  }
 
   return (
-    <div className="app">      
+    <div className="app">
       <BrowserRouter>
-        <main>
-          {/* YOUR CODE HERE! */}  
-          <Sidebar setError={setError} setIsOpen={setIsOpen} setReceiptLines={setReceiptLines} error={error} receiptLines={receiptLines} products={products} checkoutForm={checkoutForm} shoppingCart={shoppingCart} isOpen={isOpen} onToggle={handleOnToggle} onCheckoutFormChange={handleOnCheckoutFormChange} onSubmitCheckoutForm={handleOnSubmitCheckoutForm} />
-          <Navbar />          
-          <Routes>
-            <Route path="/" element={
-              <div>
-                <Hero/>
-                <SubNavBar onToggle={handleOnToggle} searchTerm={searchTerm} onSearchTermChange={handleOnSearchTermChange} searchProduct={handleProductSearch} changeCategory={handleCategoryChange}/>               
-                <Home error={error} isFetching={isFetching} shoppingCart={shoppingCart} products={products} addItemToCart={handleAddItemToCart} removeItemFromCart={handleRemoveItemFromCart}/>
-              </div>            
-            } />
-            <Route path="/products/:productId" element={
-              <div>
-                <Hero/>
-                <SubNavBar onToggle={handleOnToggle} searchTerm={searchTerm} onSearchTermChange={handleOnSearchTermChange} searchProduct={handleProductSearch} changeCategory={handleCategoryChange}/>
-                <ProductDetail shoppingCart={shoppingCart} addItemToCart={handleAddItemToCart} removeItemFromCart={handleRemoveItemFromCart}/>
-              </div>            
-            } /> 
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/orders/:orderId" element={<OrderDetail />} />
-            <Route path="*" element={<NotFound/>}/>          
-          </Routes>                     
-        </main>
+        <Routes> 
+          <Route
+            path="/"
+            element={
+              <Home
+                user={user}
+                updateProduct={updateProduct}
+                errors={errors}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                isCheckingOut={isCheckingOut}
+                products={products}
+                isFetching={isFetching}
+                activeCategory={activeCategory}
+                setActiveCategory={setActiveCategory}
+                searchInputValue={searchInputValue}
+                handleOnSearchInputChange={handleOnSearchInputChange}
+                cart={cart}
+                addToCart={handleOnAddToCart}
+                removeFromCart={handleOnRemoveFromCart}                
+                getQuantityOfItemInCart={handleGetItemQuantity}
+                handleLogout={handleLogout}  
+                searchProduct={handleOnProductSearch}  
+                handleOnCheckout={handleOnCheckout}            
+              />
+            }
+          />  
+          <Route path="/store/:productId" element={  
+            <ProductDetail 
+              user={user} 
+              updateProduct = {updateProduct}                
+              addToCart={handleOnAddToCart}
+              removeFromCart={handleOnRemoveFromCart}
+              getQuantityOfItemInCart={handleGetItemQuantity}
+              handleLogout={handleLogout}              
+            />
+          } />          
+          <Route path="/login" element={<Login user={user} setUser={setUser} />} />
+          <Route path="/signup" element={<Register user={user} setUser={setUser} />} />
+          <Route
+            path="/orders"
+            element={
+              <Orders
+                user={user} 
+                isFetching={isFetching} 
+                errors={errors}              
+                orders={orders}                            
+                handleLogout={handleLogout}                
+              />
+            }
+          />          
+          <Route
+            path="/shopping-cart"
+            element={
+              <ShoppingCart
+                user={user}
+                cart={cart}                  
+                addToCart={handleOnAddToCart}
+                removeFromCart={handleOnRemoveFromCart}
+                deleteFromCart={handleOnDeleteFromCart}
+                isCheckingOut={isCheckingOut}
+                getQuantityOfItemInCart={handleGetItemQuantity}
+                getTotalItemsInCart={handleGetTotalCartItems}                
+                handleOnCheckout={handleOnCheckout}
+                handleLogout={handleLogout}                
+              />
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <NotFound/>
+            }
+          />
+        </Routes>
       </BrowserRouter>
     </div>
   )
