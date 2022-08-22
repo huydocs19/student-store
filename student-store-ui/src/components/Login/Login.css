@@ -18,9 +18,6 @@
     flex-direction: column;
     align-items: center;
   }
-  .login .card .error {
-    color: var(--bright-red);
-  }
   .login .card h2 {
     font-size: 26px;
     margin-bottom: 40px;

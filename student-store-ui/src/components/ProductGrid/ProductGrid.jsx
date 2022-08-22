@@ -1,7 +1,11 @@
 import {ProductCard} from "components"
 import "./ProductGrid.css"
 
-export default function ProductGrid({ isFetching,
+export default function ProductGrid({ 
+   user,
+   errors,
+   updateProduct,
+   isFetching,
    addToCart, 
    removeFromCart, 
    getQuantityOfItemInCart, 
@@ -15,10 +19,15 @@ export default function ProductGrid({ isFetching,
           <div className="card">
             <p>Loading...</p>
           </div>:
+          errors.user? <span className="error">{errors.user}</span>:
+          errors.products? <span className="error">{errors.products}</span>:
+          errors.productSearch? <span className="error">{errors.productSearch}</span>:
           <div className="grid">
             {products?.map((product) => (
               <ProductCard
                 key={product.id}
+                user={user}
+                updateProduct={updateProduct}
                 product={product}
                 quantity={getQuantityOfItemInCart(product)}
                 addToCart={() => addToCart(product)}

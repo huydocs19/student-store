@@ -7,4 +7,7 @@
   flex-direction: column;
   overflow-x: hidden;
 }
+.app .error {
+  color: var(--bright-red);
+}
 

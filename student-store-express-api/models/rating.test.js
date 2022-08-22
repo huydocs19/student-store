@@ -29,15 +29,19 @@ describe("Order", () => {
           createdAt: expect.any(Date)          
         })
       })
-      test("Throws error if user has already added a rating for the product", async () => {
+      test("Update rating if user has already added a rating for the product", async () => {
         const user = { username: "jlo" }
         const rating = 2              
         const productId = testProductIds[0]        
-        try {
-          await Rating.createRatingForProduct({rating, user, productId})
-        } catch (err) {
-          expect(err instanceof BadRequestError).toBeTruthy()
-        }
+        const userRating = await Rating.createRatingForProduct({rating, user, productId})
+          
+        expect(userRating).toEqual({
+          rating: 2,
+          customerId: expect.any(Number),
+          username: "jlo",
+          productId: productId,
+          createdAt: expect.any(Date)          
+        })
       })
   
       test("Throws error with invalid rating", async () => {

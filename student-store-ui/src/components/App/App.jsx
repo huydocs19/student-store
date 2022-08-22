@@ -22,12 +22,12 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState("All Categories")
   const [searchInputValue, setSearchInputValue] = useState("")
   const [user, setUser] = useState({})
-  const [products, setProducts] = useState([])  
+  const [products, setProducts] = useState([])
+  const [orders, setOrders] = useState([])
   const [cart, setCart] = useState({})
   const [isFetching, setIsFetching] = useState(false)
-  const [orders, setOrders] = useState([])
   const [isCheckingOut, setIsCheckingOut] = useState(false)
-  const [error, setError] = useState(null)  
+  const [errors, setErrors] = useState({}) 
   const [isOpen, setIsOpen] = useState(false)
 
   const handleOnRemoveFromCart = (item) => setCart(removeFromCart(cart, item))
@@ -44,15 +44,16 @@ export default function App() {
 
     const {data, error} = await apiClient.createOrder({ order: cart })
     if (error) {
-      setError(error)
+      setErrors((e) => ({ ...e, checkout: error }))
     }    
-    if (data?.order) {      
+    if (data?.order) {     
+      setOrders((o) => [...data.order, ...o]) 
       setIsCheckingOut(false)
       setCart({})
       removeCartToken()
       return data.order    
     } else {
-      setError("Error checking out.")
+      setErrors((e) => ({ ...e, checkout: "Error checking out."}))
     }
     setIsCheckingOut(false)    
   }
@@ -62,24 +63,30 @@ export default function App() {
 
       const {data, error} = await apiClient.fetchProductList()      
       if (error) {
-        setError(error)
+        setErrors((e) => ({ ...e, productSearch: error }))
       }
-      if (data?.products) {
-        const filteredProductsByCategory = data.products.filter(product => {
-          if (activeCategory === "All Categories") { 
-            return true
-          } 
-          return product.category === activeCategory.toLowerCase()   
-        })        
-        const filteredProducts = filteredProductsByCategory.filter(product => product.name.toLowerCase().includes(searchInputValue.toLowerCase())) 
-        setProducts(filteredProducts)    
+      if (data?.products) {             
+        const filteredProducts = data.products.filter(product => product.name.toLowerCase().includes(searchInputValue.toLowerCase())) 
+        setProducts(filteredProducts)
+        setActiveCategory("")    
       } else {
-        setError("Error fetching products.")
+        setErrors((e) => ({ ...e, productSearch: "Error fetching products." }))
       }
       setIsFetching(false)
       setSearchInputValue("")
     }
     fetchProductsBySearchInputValue()    
+  }
+  const updateProduct = ({ productId, productUpdate }) => {
+    setProducts((oldProducts) => {
+      return oldProducts.map((product) => {
+        if (product.id === Number(productId)) {
+          return { ...product, ...productUpdate }
+        }
+
+        return product
+      })
+    })
   }
 
   useEffect(() => {
@@ -88,7 +95,7 @@ export default function App() {
 
       const {data, error} = await apiClient.fetchProductList()      
       if (error) {
-        setError(error)
+        setErrors((e) => ({ ...e, products: error }))
       }
       if (data?.products) {
         const filteredProducts = data.products.filter(product => {
@@ -99,11 +106,13 @@ export default function App() {
         })        
         setProducts(filteredProducts)    
       } else {
-        setError("Error fetching products.")
+        setErrors((e) => ({ ...e, products: "Error fetching products." }))
       }
       setIsFetching(false)
-    }    
-    fetchProducts()
+    }   
+    if (activeCategory) {
+      fetchProducts()
+    }     
   }, [activeCategory])
   useEffect(() => {
     const fetchAuthedUser = async () => {
@@ -111,12 +120,12 @@ export default function App() {
       
       const {data, error} = await apiClient.fetchUserFromToken()      
       if (error) {
-        setError(error)
+        setErrors((e) => ({ ...e, user: error }))
       }
       if (data?.user) {
         setUser(data.user)        
       } else {
-        setError("Error fetching user.")
+        setErrors((e) => ({ ...e, user: "Error fetching user." }))
       }      
       setIsFetching(false)
     }    
@@ -129,6 +138,25 @@ export default function App() {
     
   }, [])
   useEffect(() => {
+    const fetchOrders = async () => {
+      setIsFetching(true)      
+      const {data, error} = await apiClient.fetchOrderList()     
+      if (error) {
+        setErrors((e) => ({ ...e, orders: error }))
+      }
+      if (data?.orders) {         
+        setOrders(data.orders)    
+      } else {
+        setErrors((e) => ({ ...e, orders: "Error fetching orders." }))
+      }
+      setIsFetching(false)
+    }       
+    if (user?.username) { 
+      fetchOrders()
+    }
+    
+  }, [user])
+  useEffect(() => {
     const localCart = getCartFromToken()
     if (localCart && Object.keys(localCart).length > 0) {      
       setCart(localCart)
@@ -139,7 +167,7 @@ export default function App() {
     await apiClient.logOutUser()
     setUser(null)
     setOrders([])    
-    setError(null)
+    setErrors({})
   }
 
   return (
@@ -151,7 +179,8 @@ export default function App() {
             element={
               <Home
                 user={user}
-                error={error}
+                updateProduct={updateProduct}
+                errors={errors}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
                 isCheckingOut={isCheckingOut}
@@ -170,20 +199,15 @@ export default function App() {
                 handleOnCheckout={handleOnCheckout}            
               />
             }
-          />          
-          
+          />  
           <Route path="/store/:productId" element={  
             <ProductDetail 
-              user={user}               
-              activeCategory={activeCategory}
-              setActiveCategory={setActiveCategory}
-              searchInputValue={searchInputValue}
-              handleOnSearchInputChange={handleOnSearchInputChange}
+              user={user} 
+              updateProduct = {updateProduct}                
               addToCart={handleOnAddToCart}
               removeFromCart={handleOnRemoveFromCart}
               getQuantityOfItemInCart={handleGetItemQuantity}
-              handleLogout={handleLogout}
-              searchProduct={handleOnProductSearch}
+              handleLogout={handleLogout}              
             />
           } />          
           <Route path="/login" element={<Login user={user} setUser={setUser} />} />
@@ -192,9 +216,10 @@ export default function App() {
             path="/orders"
             element={
               <Orders
-                user={user}                
-                orders={orders}
-                setOrders = {setOrders}                
+                user={user} 
+                isFetching={isFetching} 
+                errors={errors}              
+                orders={orders}                            
                 handleLogout={handleLogout}                
               />
             }
@@ -219,15 +244,7 @@ export default function App() {
           <Route
             path="*"
             element={
-              <NotFound
-                user={user}                
-                activeCategory={activeCategory}
-                setActiveCategory={setActiveCategory}
-                searchInputValue={searchInputValue}
-                handleOnSearchInputChange={handleOnSearchInputChange}
-                handleLogout={handleLogout}
-                searchProduct={handleOnProductSearch}
-              />
+              <NotFound/>
             }
           />
         </Routes>

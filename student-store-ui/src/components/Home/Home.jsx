@@ -14,7 +14,10 @@ import "./Home.css"
 
 export default function Home({
   user,
+  errors,
+  updateProduct,
   isFetching,
+  isCheckingOut,
   isOpen,
   setIsOpen,
   products,
@@ -44,9 +47,11 @@ export default function Home({
   return (
     <div className="Home">  
       <Sidebar user={user} 
+      errors={errors}
       products={products} 
       cart={cart}       
-      isOpen={isOpen} 
+      isOpen={isOpen}
+      isCheckingOut={isCheckingOut} 
       setIsOpen={setIsOpen}
       getQuantityOfItemInCart={getQuantityOfItemInCart}
       handleOnCheckout={handleOnCheckout}/>    
@@ -61,6 +66,9 @@ export default function Home({
         searchProduct={searchProduct}
       />            
       <ProductGrid
+        user={user}
+        errors={errors}
+        updateProduct = {updateProduct}
         products={products}
         isFetching={isFetching}
         addToCart={addToCart}

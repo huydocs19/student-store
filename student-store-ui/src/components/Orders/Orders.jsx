@@ -1,5 +1,3 @@
-import {useState, useEffect} from "react"
-import apiClient from "../../services/apiClient"
 import { Footer, NavBar } from "components"
 import { formatPrice } from "../../utils/format"
 import {
@@ -21,34 +19,16 @@ const groupOrderDetailsByOrderId = (orderDetails) => {
 }
 
 export default function Orders({
-  user,  
-  orders,
-  setOrders,
+  user, 
+  isFetching,
+  errors, 
+  orders,  
   handleLogout, 
 }) {    
-  const [isFetching, setIsFetching] = useState(false)
-  const [hasOrders, setHasOrders] = useState(false)  
-  useEffect(() => {
-    const fetchOrders = async () => {
-      setIsFetching(true)      
-      const {data} = await apiClient.fetchOrderList()     
-      
-      if (data?.orders && data.orders.length > 1) { 
-        const ordersMapping = groupOrderDetailsByOrderId(data.orders) 
-        setHasOrders(Boolean(Object.keys(orders)?.length))
-        setOrders(ordersMapping)    
-      } 
-      setIsFetching(false)
-    }
-    const token = localStorage.getItem(apiClient.getTokenKey())    
-    if (token) {
-      apiClient.setToken(token)
-      if (!orders || orders.length < 1) {
-        fetchOrders()
-      }      
-    }
-    
-  }, [orders, setOrders])
+  
+  const ordersMapping = groupOrderDetailsByOrderId(orders)
+
+  const hasOrders = Boolean(Object.keys(ordersMapping)?.length)
   
 
   return (
@@ -65,6 +45,7 @@ export default function Orders({
           <div className="card">
             <p>Loading...</p>
           </div>:
+        errors.orders ? <span className="error">Error: {errors.orders}</span>:
         <div className="order-list">
           <div className="order-list-header">
             <span>Order</span>
@@ -74,8 +55,8 @@ export default function Orders({
             <span className="center">Cost</span>
           </div>
 
-          {Object.keys(orders)?.map((orderId) => (
-            <OrderItem key={orderId} orderId={orderId} orderItems={orders[orderId]} />
+          {Object.keys(ordersMapping)?.map((orderId) => (
+            <OrderItem key={orderId} orderId={orderId} orderItems={ordersMapping[orderId]} />
           ))}
 
           {!hasOrders ? (

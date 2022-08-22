@@ -1,54 +1,52 @@
 import {useState, useEffect} from "react"
 import apiClient from "../../services/apiClient"
 import { useParams } from "react-router-dom"
-import {Hero, NavBar, SubNavBar, NotFound, ProductView} from "components"
+import {NavBar, NotFound, ProductView} from "components"
 import "./ProductDetail.css"
 
 export default function ProductDetail({
-  user, 
-  activeCategory,
-  setActiveCategory,
-  handleOnSearchInputChange,
-  searchInputValue,
+  user,
+  updateProduct,   
   addToCart,
   removeFromCart,
   getQuantityOfItemInCart,
-  handleLogout,
-  searchProduct,
+  handleLogout,  
 }) {
   const [product, setProduct] = useState(null)
-  const [isFetching, setIsFetching] = useState(false)   
+  const [isFetching, setIsFetching] = useState(false)
+  const [error, setError] = useState(null)   
   let {productId} = useParams() 
   
   useEffect(() => {
     const fetchProduct = async () => {
       setIsFetching(true)      
-      const {data} = await apiClient.fetchProductById(productId) 
+      const {data, error} = await apiClient.fetchProductById(productId) 
+      if (error) {
+        setError(error)
+      }
       if (data?.product) {       
         setProduct(data.product)                      
-      } 
+      } else {
+        setError("Error fetching the product.")
+      }
       setIsFetching(false)      
     } 
     fetchProduct()
   }, [productId]);
   return (
     <div className="product-detail">
-      <NavBar user={user} handleLogout={handleLogout}/>
-      <Hero />
-      <SubNavBar        
-        activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
-        handleOnSearchInputChange={handleOnSearchInputChange}
-        searchInputValue={searchInputValue}        
-        searchProduct={searchProduct}
-      />
+      <NavBar user={user} handleLogout={handleLogout}/>       
       {isFetching ? 
           <div className="card">
             <p>Loading...</p>
           </div>:
+        error ? <span className="error">Error: {error}</span>:
         product ?
         <ProductView 
+          user={user}
+          updateProduct={updateProduct}
           product={product} 
+          setProduct={setProduct}
           quantity={getQuantityOfItemInCart(product)} 
           addToCart={addToCart} 
           removeFromCart={removeFromCart}

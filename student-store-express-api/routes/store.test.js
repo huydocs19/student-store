@@ -80,11 +80,19 @@ describe("POST /store/:productId/ratings", () => {
     })
   })
   test("Throws BadRequest error if user has already added a rating for the product", async () => {
-    const productId = testProductIds[0]  
-    const productRes = await request(app)
+    const productId = testProductIds[0]
+    const ratingRes = await request(app)
     .post(`/store/${productId}/ratings`).send({rating: 2})
     .set("authorization", `Bearer ${testTokens.jloToken}`)
-    expect(productRes.statusCode).toEqual(400)
+    expect(ratingRes.statusCode).toEqual(201)    
+    const {rating} = ratingRes.body        
+    expect(rating).toEqual({
+      rating: 2,
+      customerId: expect.any(Number),
+      username: "jlo",
+      productId: productId,
+      createdAt: expect.any(String)          
+    })
   })
 
   test("Throws BadRequest error with invalid rating", async () => {

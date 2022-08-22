@@ -3,9 +3,11 @@ import "./SidebarShoppingCart.css"
 
 export default function SidebarShoppingCart({
     user,
+    errors,
     products,
     cart,     
-    isOpen, 
+    isOpen,
+    isCheckingOut, 
     setIsOpen,
     getQuantityOfItemInCart,
     handleOnCheckout,
@@ -20,7 +22,7 @@ export default function SidebarShoppingCart({
               </h3>            
               {cartHasItems ? 
               <CartTable 
-              user={user} products={products} cart={cart} getQuantityOfItemInCart={getQuantityOfItemInCart} handleOnCheckout={handleOnCheckout}
+              user={user} isCheckingOut={isCheckingOut} errors={errors} products={products} cart={cart} getQuantityOfItemInCart={getQuantityOfItemInCart} handleOnCheckout={handleOnCheckout}
               />: 
               <div className="notification">No items added to cart yet. Start shopping now!</div>
               }              

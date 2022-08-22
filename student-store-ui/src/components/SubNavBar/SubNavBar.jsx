@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import person from "../../assets/person.svg"
 import "./SubNavBar.css"
 
 export default function SubNavBar({  

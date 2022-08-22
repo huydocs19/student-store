@@ -23,9 +23,6 @@
     margin-bottom: 40px;
     font-weight: 600;
   }
-  .register .card .error {
-    color: var(--bright-red);
-  }
   .register .card .form {
     display: flex;
     flex-direction: column;

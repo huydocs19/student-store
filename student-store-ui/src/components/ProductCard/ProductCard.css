@@ -36,7 +36,30 @@
     width: 80px;
     display: flex;
     flex-direction: column;
-    justify-content: space-around
+    justify-content: space-around;
+}
+.product-card .actions .rate-product {
+    min-width: 200px;    
+}
+.product-card .error{
+    padding: 0 12px;     
+}
+.product-card .actions .rate-product p{
+    padding: 8px 12px;  
+    color: var(--bright-green);  
+}
+.product-card .actions .rate-product .btn{    
+    margin: 10px 12px;
+    width: 120px;
+    height: 50px;
+    color: white;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bright-green);
+    border: none;
+    cursor: pointer;
 }
 .product-card .product-quantity {
     width: 80px;

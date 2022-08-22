@@ -45,6 +45,9 @@ class ApiClient {
     async fetchOrderList() {
         return await this.request({ endpoint: "orders", method: "GET"}) 
     }
+    async createRatingForProduct({ productId, rating }) {
+        return await this.request({ endpoint: `store/${productId}/ratings`, method: `POST`, data: { rating } })
+    }
     async fetchProductById(productId) {
         return await this.request({ endpoint: `store/${productId}`, method: "GET"}) 
     }

@@ -4,6 +4,8 @@ import { calculateItemSubtotal, calculateTaxesAndFees, calculateTotal} from "../
 
 export default function CartTable({
   user, 
+  isCheckingOut,
+  errors,
   products, 
   cart, 
   getQuantityOfItemInCart,
@@ -75,9 +77,10 @@ export default function CartTable({
           </div>
         ) : null}
 
+        {errors.checkout && <span className="error">Error: {errors.checkout}</span>}
         <div className="checkout">
           {user?.email ? (
-            <button onClick={onCheckoutSubmit}>Checkout</button>
+            <button onClick={onCheckoutSubmit}>{isCheckingOut? "Checking out...": "Checkout"}</button>
           ) : (
             <button className="is-disabled" disabled>
               Sign In To Checkout

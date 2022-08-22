@@ -17,7 +17,22 @@ class Rating {
     // if they have, throw an error
     const existingRating = await Rating.fetchRatingForProductByUser({ user, productId })
     if (existingRating) {
-      throw new BadRequestError(`Users aren't allowed to leave multiple ratings for a single product.`)
+      const results = await db.query(
+        `
+        UPDATE ratings
+        SET rating = $1        
+        WHERE customer_id = (SELECT id FROM users WHERE username = $2) AND product_id = $3        
+        RETURNING rating, 
+            $2 AS username,
+            customer_id AS "customerId", 
+            product_id AS "productId", 
+            created_at AS "createdAt";                      
+        `,
+        [              
+          rating, user.username, productId
+        ]
+      )               
+      return results.rows[0]
     }
     // otherwise insert a new record into the database
     const results = await db.query(
